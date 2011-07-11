@@ -20,6 +20,7 @@ namespace Hazychill.NicoCacheDriver {
         bool settingsLoaded;
         string workingUrl;
         SettingsManager smng;
+        bool interrapting;
 
         public nicoCacheDriverForm() {
             InitializeComponent();
@@ -181,10 +182,11 @@ namespace Hazychill.NicoCacheDriver {
                 }
             }
 
-            if (e.Cancelled) {
+            if (e.Cancelled && !interrapting) {
                 queueingUrls.AppendText(string.Format("{0}\r\n", workingUrl));
             }
             outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl));
+            interrapting = false;
         }
 
         private void button1_Click(object sender, EventArgs e) {
@@ -320,7 +322,7 @@ namespace Hazychill.NicoCacheDriver {
                 if (lines.Length-1 >= 0) {
                     queueingUrls.AppendText(string.Format("{0}\r\n", lines[lines.Length-1]));
                 }
-
+                interrapting = true;
                 downloadWorker.CancelAsync();
             }
             else { 
