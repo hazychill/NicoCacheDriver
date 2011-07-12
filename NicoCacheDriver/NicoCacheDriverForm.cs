@@ -184,6 +184,8 @@ namespace Hazychill.NicoCacheDriver {
 
             if (e.Cancelled && !interrapting) {
                 queueingUrls.AppendText(string.Format("{0}\r\n", workingUrl));
+                label1.Text = string.Empty;
+                progressBar1.Value = 0;
             }
             outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl));
             interrapting = false;
