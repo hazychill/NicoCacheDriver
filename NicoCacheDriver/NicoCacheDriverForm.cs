@@ -207,19 +207,18 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void timer1_Tick(object sender, EventArgs e) {
-            if (!downloadWorker.IsBusy) {
-                StartDownload();
+            if (IsInTime()) {
+                statusIndicator.BackColor = Color.Lime;
+                if (!downloadWorker.IsBusy) {
+                    StartDownload();
+                }
+            }
+            else {
+                statusIndicator.BackColor = Color.Red;
             }
         }
 
         private void StartDownload() {
-            if (!IsInTime()) {
-                statusIndicator.BackColor = Color.Red;
-                return;
-            }
-            else {
-                statusIndicator.BackColor = Color.Green;
-            }
             queueingUrls.ReadOnly = true;
             startButton.Enabled = false;
             interceptButton.Enabled = false;
