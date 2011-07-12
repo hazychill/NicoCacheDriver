@@ -25,19 +25,19 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.label2 = new System.Windows.Forms.Label();
+            this.downloadableTimeEnabled = new System.Windows.Forms.CheckBox();
+            this.downloadableTimeEnd = new System.Windows.Forms.DateTimePicker();
+            this.downloadableTimeStart = new System.Windows.Forms.DateTimePicker();
             this.interceptButton = new System.Windows.Forms.Button();
             this.startButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.queueingUrls = new System.Windows.Forms.TextBox();
+            this.statusIndicator = new System.Windows.Forms.Panel();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
-            this.downloadableTimeStart = new System.Windows.Forms.DateTimePicker();
-            this.downloadableTimeEnd = new System.Windows.Forms.DateTimePicker();
-            this.downloadableTimeEnabled = new System.Windows.Forms.CheckBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.statusIndicator = new System.Windows.Forms.Panel();
-            this.downloadWorker = new NicoCacheDriver.DownloadWorker();
+            this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -71,6 +71,49 @@
             this.splitContainer1.Size = new System.Drawing.Size(540, 543);
             this.splitContainer1.SplitterDistance = 319;
             this.splitContainer1.TabIndex = 4;
+            // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(414, 236);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(11, 12);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "-";
+            // 
+            // downloadableTimeEnabled
+            // 
+            this.downloadableTimeEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.downloadableTimeEnabled.AutoSize = true;
+            this.downloadableTimeEnabled.Location = new System.Drawing.Point(298, 236);
+            this.downloadableTimeEnabled.Name = "downloadableTimeEnabled";
+            this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
+            this.downloadableTimeEnabled.TabIndex = 8;
+            this.downloadableTimeEnabled.UseVisualStyleBackColor = true;
+            this.downloadableTimeEnabled.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // downloadableTimeEnd
+            // 
+            this.downloadableTimeEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.downloadableTimeEnd.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.downloadableTimeEnd.Location = new System.Drawing.Point(431, 233);
+            this.downloadableTimeEnd.Name = "downloadableTimeEnd";
+            this.downloadableTimeEnd.ShowUpDown = true;
+            this.downloadableTimeEnd.Size = new System.Drawing.Size(89, 19);
+            this.downloadableTimeEnd.TabIndex = 7;
+            this.downloadableTimeEnd.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
+            // 
+            // downloadableTimeStart
+            // 
+            this.downloadableTimeStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.downloadableTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.downloadableTimeStart.Location = new System.Drawing.Point(319, 233);
+            this.downloadableTimeStart.Name = "downloadableTimeStart";
+            this.downloadableTimeStart.ShowUpDown = true;
+            this.downloadableTimeStart.Size = new System.Drawing.Size(89, 19);
+            this.downloadableTimeStart.TabIndex = 6;
+            this.downloadableTimeStart.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             // 
             // interceptButton
             // 
@@ -118,6 +161,7 @@
             this.queueingUrls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.queueingUrls.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.queueingUrls.Location = new System.Drawing.Point(12, 12);
             this.queueingUrls.Multiline = true;
             this.queueingUrls.Name = "queueingUrls";
@@ -125,12 +169,22 @@
             this.queueingUrls.Size = new System.Drawing.Size(514, 213);
             this.queueingUrls.TabIndex = 0;
             // 
+            // statusIndicator
+            // 
+            this.statusIndicator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.statusIndicator.BackColor = System.Drawing.Color.Gray;
+            this.statusIndicator.Location = new System.Drawing.Point(13, 232);
+            this.statusIndicator.Name = "statusIndicator";
+            this.statusIndicator.Size = new System.Drawing.Size(20, 20);
+            this.statusIndicator.TabIndex = 10;
+            // 
             // outputTextBox
             // 
             this.outputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.outputTextBox.BackColor = System.Drawing.SystemColors.Window;
+            this.outputTextBox.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.outputTextBox.Location = new System.Drawing.Point(12, 12);
             this.outputTextBox.Multiline = true;
             this.outputTextBox.Name = "outputTextBox";
@@ -144,62 +198,10 @@
             this.pollingTimer.Interval = 1000;
             this.pollingTimer.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // downloadableTimeStart
-            // 
-            this.downloadableTimeStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.downloadableTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeStart.Location = new System.Drawing.Point(319, 233);
-            this.downloadableTimeStart.Name = "downloadableTimeStart";
-            this.downloadableTimeStart.ShowUpDown = true;
-            this.downloadableTimeStart.Size = new System.Drawing.Size(89, 19);
-            this.downloadableTimeStart.TabIndex = 6;
-            this.downloadableTimeStart.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
-            // 
-            // downloadableTimeEnd
-            // 
-            this.downloadableTimeEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.downloadableTimeEnd.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeEnd.Location = new System.Drawing.Point(431, 233);
-            this.downloadableTimeEnd.Name = "downloadableTimeEnd";
-            this.downloadableTimeEnd.ShowUpDown = true;
-            this.downloadableTimeEnd.Size = new System.Drawing.Size(89, 19);
-            this.downloadableTimeEnd.TabIndex = 7;
-            this.downloadableTimeEnd.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
-            // 
-            // downloadableTimeEnabled
-            // 
-            this.downloadableTimeEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.downloadableTimeEnabled.AutoSize = true;
-            this.downloadableTimeEnabled.Location = new System.Drawing.Point(298, 236);
-            this.downloadableTimeEnabled.Name = "downloadableTimeEnabled";
-            this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
-            this.downloadableTimeEnabled.TabIndex = 8;
-            this.downloadableTimeEnabled.UseVisualStyleBackColor = true;
-            this.downloadableTimeEnabled.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
-            // label2
-            // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(414, 236);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(11, 12);
-            this.label2.TabIndex = 9;
-            this.label2.Text = "-";
-            // 
-            // statusIndicator
-            // 
-            this.statusIndicator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.statusIndicator.BackColor = System.Drawing.Color.Gray;
-            this.statusIndicator.Location = new System.Drawing.Point(13, 232);
-            this.statusIndicator.Name = "statusIndicator";
-            this.statusIndicator.Size = new System.Drawing.Size(20, 20);
-            this.statusIndicator.TabIndex = 10;
-            // 
             // downloadWorker
             // 
             this.downloadWorker.WatchUrl = null;
-            this.downloadWorker.DownloadProgressChanged += new NicoCacheDriver.DownloadProgressChangedEventHandler(this.downloadWorker1_DownloadProgressChanged);
+            this.downloadWorker.DownloadProgressChanged += new Hazychill.NicoCacheDriver.DownloadProgressChangedEventHandler(this.downloadWorker1_DownloadProgressChanged);
             this.downloadWorker.DownloadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.downloadWorker1_DownloadCompleted);
             // 
             // nicoCacheDriverForm
