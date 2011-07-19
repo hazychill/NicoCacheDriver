@@ -64,10 +64,12 @@
             this.splitContainer1.Panel1.Controls.Add(this.progressBar1);
             this.splitContainer1.Panel1.Controls.Add(this.queueingUrls);
             this.splitContainer1.Panel1.Controls.Add(this.statusIndicator);
+            this.splitContainer1.Panel1MinSize = 0;
             // 
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.outputTextBox);
+            this.splitContainer1.Panel2MinSize = 0;
             this.splitContainer1.Size = new System.Drawing.Size(540, 543);
             this.splitContainer1.SplitterDistance = 319;
             this.splitContainer1.TabIndex = 4;
