@@ -8,6 +8,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Globalization;
 
 namespace Hazychill.NicoCacheDriver {
     class DownloadWorker : Component {
@@ -67,6 +68,7 @@ namespace Hazychill.NicoCacheDriver {
 
             Encoding utf8 = new UTF8Encoding();
             bool completed = false;
+            string title = null;
 
             CheckCancelled();
 
@@ -86,6 +88,22 @@ namespace Hazychill.NicoCacheDriver {
             using (Stream responseStream = response.GetResponseStream())
             using (TextReader reader = new StreamReader(responseStream, utf8)) {
                 responseText = reader.ReadToEnd();
+            }
+
+            // ^\s*title:\s*'(?<title>[^']*)'
+            Match titleMatch = Regex.Match(responseText, "^\\s*title:\\s*\'(?<title>[^\']*)\'", RegexOptions.Multiline);
+            if (titleMatch.Success) {
+                string titleRaw = titleMatch.Groups["title"].Value;
+                // \\u([0-9a-f]{4})
+                title = Regex.Replace(titleRaw, "\\\\u([0-9a-f]{4})", delegate(Match m) {
+                    int utf32 = int.Parse(m.Groups[1].Value, NumberStyles.HexNumber);
+                    string c = char.ConvertFromUtf32(utf32);
+                    return c;
+                });
+                if (asyncOp != null) {
+                    DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(0, 0, 0, title, asyncOp.UserSuppliedState);
+                    asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
+                }
             }
 
             CheckCancelled();
@@ -136,7 +154,7 @@ namespace Hazychill.NicoCacheDriver {
                     previousPercentage = percentage;
                 }
                 if (asyncOp != null) {
-                    DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, 0, contentLength, asyncOp.UserSuppliedState);
+                    DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, 0, contentLength, title, asyncOp.UserSuppliedState);
                     asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                 }
 
@@ -154,7 +172,7 @@ namespace Hazychill.NicoCacheDriver {
                         if (asyncOp != null) {
                             bool canAccess = Timer.CanAccess("urn:uuid:ae64b59c-e55e-473b-9cb5-64ae5ee53b47");
                             if (canAccess) {
-                                DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, read, contentLength, asyncOp.UserSuppliedState);
+                                DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, read, contentLength, title, asyncOp.UserSuppliedState);
                                 asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                             }
                         }
@@ -163,7 +181,7 @@ namespace Hazychill.NicoCacheDriver {
                 }
 
                 if (asyncOp != null) {
-                    DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, read, contentLength, asyncOp.UserSuppliedState);
+                    DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, read, contentLength, title, asyncOp.UserSuppliedState);
                     asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                 }
 
@@ -172,7 +190,7 @@ namespace Hazychill.NicoCacheDriver {
                     if ((previousPercentage < percentage)) {
                         previousPercentage = percentage;
                         if (asyncOp != null) {
-                            DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, read, contentLength, asyncOp.UserSuppliedState);
+                            DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, read, contentLength, title, asyncOp.UserSuppliedState);
                             asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                         }
                     }

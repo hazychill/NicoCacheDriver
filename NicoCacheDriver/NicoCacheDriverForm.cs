@@ -19,6 +19,7 @@ namespace Hazychill.NicoCacheDriver {
     public partial class nicoCacheDriverForm : Form {
         bool settingsLoaded;
         string workingUrl;
+        string workingTitle;
         SettingsManager smng;
         bool interrapting;
 
@@ -155,12 +156,17 @@ namespace Hazychill.NicoCacheDriver {
                 progressBar1.Maximum = (int)e.TotalBytesToReceive;
             }
             progressBar1.Value = (int)e.BytesReceived;
+            string id = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
             if (e.WillWait > 0) {
-                label1.Text = string.Format("{0} (waiting {1}s)", workingUrl, e.WillWait / 1000.0);
+                label1.Text = string.Format("{0} (waiting {1}s)", id, e.WillWait / 1000.0);
+            }
+            else if (e.Title != null) {
+                label1.Text = string.Format("{0} ({1}/{2}) {3}", id, e.BytesReceived, e.TotalBytesToReceive, e.Title);
             }
             else {
-                label1.Text = string.Format("{0} ({1}/{2})", workingUrl, e.BytesReceived, e.TotalBytesToReceive);
+                label1.Text = string.Format("{0} ({1}/{2})", id, e.BytesReceived, e.TotalBytesToReceive);
             }
+            workingTitle = e.Title;
         }
 
         private void downloadWorker1_DownloadCompleted(object sender, AsyncCompletedEventArgs e) {
@@ -188,6 +194,11 @@ namespace Hazychill.NicoCacheDriver {
                 progressBar1.Value = 0;
             }
             outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl));
+            if (workingTitle != null) {
+                outputTextBox.AppendText(string.Format("          {0}\r\n", workingTitle));
+            }
+            label1.Text = string.Empty;
+            progressBar1.Value = 0; ;
             interrapting = false;
         }
 
@@ -236,6 +247,7 @@ namespace Hazychill.NicoCacheDriver {
                 return;
             }
             workingUrl = lines[lines.Length-1];
+            workingTitle = null;
 
             queueingUrls.Clear();
             smng.RemoveAll<string>("url");
@@ -254,7 +266,7 @@ namespace Hazychill.NicoCacheDriver {
 
             downloadWorker.WatchUrl = workingUrl;
             downloadWorker.DownloadAsync(null);
-            label1.Text = workingUrl;
+            label1.Text = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
             progressBar1.Value = 0;
         }
 
