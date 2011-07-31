@@ -78,7 +78,7 @@ namespace Hazychill.NicoCacheDriver {
                     DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(0, 0, 0, waitMilliseconds, asyncOp.UserSuppliedState);
                     asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                 }
-                Thread.Sleep(waitMilliseconds);
+                Wait(waitMilliseconds);
             }
             HttpWebRequest request = WebRequest.Create(WatchUrl) as HttpWebRequest;
             request.CookieContainer = cookies;
@@ -117,7 +117,7 @@ namespace Hazychill.NicoCacheDriver {
                     DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(0, 0, 0, waitMilliseconds, asyncOp.UserSuppliedState);
                     asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                 }
-                Thread.Sleep(waitMilliseconds);
+                Wait(waitMilliseconds);
             }
             request = WebRequest.Create(getflvUrl) as HttpWebRequest;
             request.CookieContainer = cookies;
@@ -198,6 +198,16 @@ namespace Hazychill.NicoCacheDriver {
             }
 
             return completed;
+        }
+
+        private void Wait(int waitMilliseconds) {
+            DateTime start = DateTime.Now;
+            DateTime now = DateTime.Now;
+            while ((now-start).TotalMilliseconds < waitMilliseconds) {
+                CheckCancelled();
+                Thread.Sleep(100);
+                now = DateTime.Now;
+            }
         }
 
         private void CheckCancelled() {
