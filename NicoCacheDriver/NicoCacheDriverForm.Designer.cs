@@ -174,7 +174,7 @@
             // statusIndicator
             // 
             this.statusIndicator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.statusIndicator.BackColor = System.Drawing.Color.Gray;
+            this.statusIndicator.BackColor = System.Drawing.Color.Red;
             this.statusIndicator.Location = new System.Drawing.Point(13, 232);
             this.statusIndicator.Name = "statusIndicator";
             this.statusIndicator.Size = new System.Drawing.Size(20, 20);

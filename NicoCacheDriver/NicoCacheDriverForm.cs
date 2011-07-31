@@ -215,7 +215,7 @@ namespace Hazychill.NicoCacheDriver {
                 progressBar1.Enabled = false;
                 pollingTimer.Stop();
                 downloadWorker.CancelAsync();
-                statusIndicator.BackColor = Color.Gray;
+                statusIndicator.BackColor = Color.Red;
             }
         }
 
@@ -227,7 +227,7 @@ namespace Hazychill.NicoCacheDriver {
                 }
             }
             else {
-                statusIndicator.BackColor = Color.Red;
+                statusIndicator.BackColor = Color.Gray;
             }
         }
 
