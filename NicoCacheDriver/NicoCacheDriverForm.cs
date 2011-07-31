@@ -17,6 +17,8 @@ using System.Diagnostics.Contracts;
 
 namespace Hazychill.NicoCacheDriver {
     public partial class nicoCacheDriverForm : Form {
+        private const string NEWLINE = "\r\n";
+
         bool settingsLoaded;
         string workingUrl;
         string workingTitle;
@@ -54,7 +56,11 @@ namespace Hazychill.NicoCacheDriver {
                 downloadWorker.Setup(userSession, proxyHost, proxyPort, timer);
 
                 Action action = delegate() {
-                    queueingUrls.Text = string.Join("\r\n", smng.GetItems<string>("url"));
+                    WithEditQueueingUrls(delegate(string[] currentLines) {
+                        return smng.GetItems<string>("url")
+                            .Select(x => x.Value)
+                            .ToArray();
+                    });
                 };
                 this.Invoke(action);
 
@@ -189,7 +195,9 @@ namespace Hazychill.NicoCacheDriver {
             }
 
             if (e.Cancelled && !interrapting) {
-                queueingUrls.AppendText(string.Format("{0}\r\n", workingUrl));
+                WithEditQueueingUrls(delegate(string[] currentLines) {
+                    return currentLines.Concat(Enumerable.Repeat(workingUrl, 1)).ToArray();
+                });
                 label1.Text = string.Empty;
                 progressBar1.Value = 0;
             }
@@ -232,35 +240,41 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void StartDownload() {
-            queueingUrls.ReadOnly = true;
             startButton.Enabled = false;
             interceptButton.Enabled = false;
-            // ^\s*(http://www\.nicovideo\.jp/watch/(?:[a-z][a-z])?\d+)\s*$
-            string[] lines = queueingUrls.Lines
-                .Where(x => Regex.IsMatch(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$"))
-                .Select(x => Regex.Match(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$").Groups[1].Value)
-                .ToArray();
-            if (lines.Length == 0) {
+
+            workingUrl = null;
+            string[] lines = WithEditQueueingUrls(delegate(string[] currentLines) {
+                List<string> newLines = new List<string>();
+                int index = currentLines.Length - 1;
+                for (; index >= 0; index--) {
+                    string line = currentLines[index];
+                    if (IsValidWatchUrl(line)) {
+                        workingUrl = line;
+                        break;
+                    }
+                    else {
+                        newLines.Insert(0, line);
+                    }
+                }
+                for (int i = 0; i <= index-1; i++) {
+                    newLines.Add(currentLines[i]);
+                }
+                return newLines.ToArray();
+            });
+
+            if (workingUrl == null) {
                 queueingUrls.ReadOnly = false;
                 interceptButton.Enabled = true;
                 startButton.Enabled = true;
                 return;
             }
-            workingUrl = lines[lines.Length-1];
-            workingTitle = null;
 
-            queueingUrls.Clear();
             smng.RemoveAll<string>("url");
-            for (int i = 0; i < lines.Length-1; i++) {
-                string url = lines[i];
-                queueingUrls.AppendText(string.Format("{0}\r\n", url));
-                smng.AddItem("url", url);
+            foreach (string line in lines) {
+                smng.AddItem("url", line);
             }
 
-            // SaveSettings();
-            
-
-            queueingUrls.ReadOnly = false;
             interceptButton.Enabled = true;
             startButton.Enabled = true;
 
@@ -268,6 +282,11 @@ namespace Hazychill.NicoCacheDriver {
             downloadWorker.DownloadAsync(null);
             label1.Text = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
             progressBar1.Value = 0;
+        }
+
+        private bool IsValidWatchUrl(string line) {
+            // ^\s*(http://www\.nicovideo\.jp/watch/(?:[a-z][a-z])?\d+)\s*$
+            return Regex.IsMatch(line, "^http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+$");
         }
 
         private bool IsInTime() {
@@ -321,20 +340,16 @@ namespace Hazychill.NicoCacheDriver {
 
             if (downloadWorker.IsBusy) {
                 string interraptedUrl = workingUrl;
-                // ^\s*(http://www\.nicovideo\.jp/watch/(?:[a-z][a-z])?\d+)\s*$
-                string[] lines = queueingUrls.Lines
-                    .Where(x => Regex.IsMatch(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$"))
-                    .Select(x => Regex.Match(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$").Groups[1].Value)
-                    .ToArray();
-
-                queueingUrls.Clear();
-                for (int i = 0; i < lines.Length-1; i++) {
-                    queueingUrls.AppendText(string.Format("{0}\r\n", lines[i]));
-                }
-                queueingUrls.AppendText(string.Format("{0}\r\n", interraptedUrl));
-                if (lines.Length-1 >= 0) {
-                    queueingUrls.AppendText(string.Format("{0}\r\n", lines[lines.Length-1]));
-                }
+                WithEditQueueingUrls(delegate(string[] currentLines) {
+                    if (currentLines.Length >= 1) {
+                        List<string> newLines = new List<string>(currentLines);
+                        newLines.Insert(newLines.Count-1, interraptedUrl);
+                        return newLines.ToArray();
+                    }
+                    else {
+                        return currentLines;
+                    }
+                });
                 interrapting = true;
                 downloadWorker.CancelAsync();
             }
@@ -370,6 +385,26 @@ namespace Hazychill.NicoCacheDriver {
                 downloadableTimeStart.Enabled = false;
                 downloadableTimeEnd.Enabled = false;
             }
+        }
+
+        private string[] WithEditQueueingUrls(Func<string[], string[]> editMethod) {
+            //queueingUrls.Enabled = false;
+            string textBefore = queueingUrls.Text;
+            string[] currentLines = queueingUrls.Lines
+                .Reverse()
+                .SkipWhile(x => string.IsNullOrEmpty(x))
+                .Reverse()
+                .ToArray();
+            string[] newLines = editMethod(currentLines);
+            string textAfter = string.Format("{0}{1}", string.Join(NEWLINE, newLines), NEWLINE);
+            if (textAfter == "\r\n") {
+                textAfter = string.Empty;
+            }
+            if (!string.Equals(textBefore, textAfter, StringComparison.Ordinal)) {
+                queueingUrls.Text = textAfter;
+            }
+            //queueingUrls.Enabled = true;
+            return newLines;
         }
     }
 }
