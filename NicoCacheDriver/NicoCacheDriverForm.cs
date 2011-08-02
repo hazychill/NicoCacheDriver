@@ -24,10 +24,12 @@ namespace Hazychill.NicoCacheDriver {
         string workingTitle;
         SettingsManager smng;
         bool interrapting;
+        bool isClosing;
 
         public nicoCacheDriverForm() {
             InitializeComponent();
             settingsLoaded = false;
+            isClosing = false;
         }
 
         private void LoadSettings() {
@@ -176,6 +178,9 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void downloadWorker1_DownloadCompleted(object sender, AsyncCompletedEventArgs e) {
+            if (isClosing) {
+                return;
+            }
             string msg;
             if (e.Error != null) {
                 if (e.Cancelled == true) {
@@ -360,19 +365,28 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
-            if (downloadWorker.IsBusy || pollingTimer.Enabled == true) {
-                MessageBox.Show("Stop downloading before exit.");
-                e.Cancel = true;
+            isClosing = true;
+            this.Hide();
+
+            smng.RemoveAll<string>("url");
+            var lineQuery = queueingUrls.Lines
+                .Where(x => Regex.IsMatch(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$"))
+                .Select(x => Regex.Match(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$").Groups[1].Value);
+            foreach (string line in lineQuery) {
+                smng.AddItem("url", line);
+            }
+
+            pollingTimer.Stop();
+            if (downloadWorker.IsBusy) {
+                smng.AddItem("url", downloadWorker.WatchUrl);
+                SaveSettings();
+                downloadWorker.CancelAsync();
             }
             else {
-                smng.RemoveAll<string>("url");
-                var lineQuery = queueingUrls.Lines
-                    .Where(x => Regex.IsMatch(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$"))
-                    .Select(x => Regex.Match(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$").Groups[1].Value);
-                foreach (string line in lineQuery) {
-                    smng.AddItem("url", line);
-                }
                 SaveSettings();
+            }
+            while (downloadWorker.IsBusy) {
+                Thread.Sleep(1 * 1000);
             }
         }
 
