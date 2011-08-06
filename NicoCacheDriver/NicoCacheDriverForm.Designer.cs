@@ -191,9 +191,10 @@
             this.outputTextBox.Multiline = true;
             this.outputTextBox.Name = "outputTextBox";
             this.outputTextBox.ReadOnly = true;
-            this.outputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.outputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.outputTextBox.Size = new System.Drawing.Size(514, 194);
             this.outputTextBox.TabIndex = 0;
+            this.outputTextBox.WordWrap = false;
             // 
             // pollingTimer
             // 
@@ -206,13 +207,13 @@
             this.downloadWorker.DownloadProgressChanged += new Hazychill.NicoCacheDriver.DownloadProgressChangedEventHandler(this.downloadWorker1_DownloadProgressChanged);
             this.downloadWorker.DownloadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.downloadWorker1_DownloadCompleted);
             // 
-            // nicoCacheDriverForm
+            // NicoCacheDriverForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(540, 543);
             this.Controls.Add(this.splitContainer1);
-            this.Name = "nicoCacheDriverForm";
+            this.Name = "NicoCacheDriverForm";
             this.Text = "NicoCacheDriver";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Shown += new System.EventHandler(this.Form1_Shown);

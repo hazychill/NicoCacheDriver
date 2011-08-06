@@ -25,11 +25,13 @@ namespace Hazychill.NicoCacheDriver {
         SettingsManager smng;
         bool interrapting;
         bool isClosing;
+        string settingsFilePath;
 
-        public NicoCacheDriverForm() {
+        public NicoCacheDriverForm(string settingsFilePath) {
             InitializeComponent();
             settingsLoaded = false;
             isClosing = false;
+            this.settingsFilePath = settingsFilePath;
         }
 
         private void LoadSettings() {
@@ -63,6 +65,7 @@ namespace Hazychill.NicoCacheDriver {
                             .Select(x => x.Value)
                             .ToArray();
                     });
+                    outputTextBox.AppendText(string.Format("User session: {0}\r\n", userSession));
                 };
                 this.Invoke(action);
 
@@ -73,15 +76,20 @@ namespace Hazychill.NicoCacheDriver {
             }
         }
 
-        private static string GetSettingsFilePath() {
-            Assembly myAssembly = Assembly.GetEntryAssembly();
-            string path = myAssembly.Location;
-            string execDir = Path.GetDirectoryName(path);
-            string settingsFilePath = Path.Combine(execDir, "settings.txt");
-            return settingsFilePath;
+        private string GetSettingsFilePath() {
+            if (settingsFilePath != null) {
+                return settingsFilePath;
+            }
+            else {
+                Assembly myAssembly = Assembly.GetEntryAssembly();
+                string path = myAssembly.Location;
+                string execDir = Path.GetDirectoryName(path);
+                string defaultSettingsFilePath = Path.Combine(execDir, "settings.txt");
+                return defaultSettingsFilePath;
+            }
         }
 
-        private static string GetUserSession(SettingsManager smng) {
+        private string GetUserSession(SettingsManager smng) {
             string userSession;
             string getnicovideousersessionfromchromium = smng.GetItem<string>("getnicovideousersessionfromchromium");
             ProcessStartInfo startInfo = new ProcessStartInfo(getnicovideousersessionfromchromium);
@@ -106,6 +114,7 @@ namespace Hazychill.NicoCacheDriver {
                 c.Enabled = false;
             }
             Text = "NicoCacheDriver (Loading settings...)";
+            outputTextBox.AppendText(string.Format("Using : {0}\r\n", GetSettingsFilePath()));
             Action action = LoadSettings;
             action.BeginInvoke(delegate(IAsyncResult result) {
                 Action action2 = delegate {
