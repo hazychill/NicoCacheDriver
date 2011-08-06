@@ -30,13 +30,14 @@
             this.downloadableTimeEnd = new System.Windows.Forms.DateTimePicker();
             this.downloadableTimeStart = new System.Windows.Forms.DateTimePicker();
             this.interceptButton = new System.Windows.Forms.Button();
-            this.startButton = new System.Windows.Forms.Button();
+            this.onlineOfflineButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.queueingUrls = new System.Windows.Forms.TextBox();
             this.statusIndicator = new System.Windows.Forms.Panel();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
+            this.cancelDLButton = new System.Windows.Forms.Button();
             this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -54,12 +55,13 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.cancelDLButton);
+            this.splitContainer1.Panel1.Controls.Add(this.interceptButton);
+            this.splitContainer1.Panel1.Controls.Add(this.onlineOfflineButton);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
             this.splitContainer1.Panel1.Controls.Add(this.downloadableTimeEnabled);
             this.splitContainer1.Panel1.Controls.Add(this.downloadableTimeEnd);
             this.splitContainer1.Panel1.Controls.Add(this.downloadableTimeStart);
-            this.splitContainer1.Panel1.Controls.Add(this.interceptButton);
-            this.splitContainer1.Panel1.Controls.Add(this.startButton);
             this.splitContainer1.Panel1.Controls.Add(this.label1);
             this.splitContainer1.Panel1.Controls.Add(this.progressBar1);
             this.splitContainer1.Panel1.Controls.Add(this.queueingUrls);
@@ -70,15 +72,15 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.outputTextBox);
             this.splitContainer1.Panel2MinSize = 0;
-            this.splitContainer1.Size = new System.Drawing.Size(540, 543);
-            this.splitContainer1.SplitterDistance = 319;
+            this.splitContainer1.Size = new System.Drawing.Size(562, 551);
+            this.splitContainer1.SplitterDistance = 317;
             this.splitContainer1.TabIndex = 4;
             // 
             // label2
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(414, 236);
+            this.label2.Location = new System.Drawing.Point(442, 235);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(11, 12);
             this.label2.TabIndex = 9;
@@ -88,18 +90,18 @@
             // 
             this.downloadableTimeEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnabled.AutoSize = true;
-            this.downloadableTimeEnabled.Location = new System.Drawing.Point(298, 236);
+            this.downloadableTimeEnabled.Location = new System.Drawing.Point(334, 235);
             this.downloadableTimeEnabled.Name = "downloadableTimeEnabled";
             this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
             this.downloadableTimeEnabled.TabIndex = 8;
             this.downloadableTimeEnabled.UseVisualStyleBackColor = true;
-            this.downloadableTimeEnabled.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.downloadableTimeEnabled.CheckedChanged += new System.EventHandler(this.downloadableTimeEnabled_CheckedChanged);
             // 
             // downloadableTimeEnd
             // 
             this.downloadableTimeEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnd.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeEnd.Location = new System.Drawing.Point(431, 233);
+            this.downloadableTimeEnd.Location = new System.Drawing.Point(453, 232);
             this.downloadableTimeEnd.Name = "downloadableTimeEnd";
             this.downloadableTimeEnd.ShowUpDown = true;
             this.downloadableTimeEnd.Size = new System.Drawing.Size(89, 19);
@@ -110,7 +112,7 @@
             // 
             this.downloadableTimeStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeStart.Location = new System.Drawing.Point(319, 233);
+            this.downloadableTimeStart.Location = new System.Drawing.Point(351, 232);
             this.downloadableTimeStart.Name = "downloadableTimeStart";
             this.downloadableTimeStart.ShowUpDown = true;
             this.downloadableTimeStart.Size = new System.Drawing.Size(89, 19);
@@ -120,30 +122,31 @@
             // interceptButton
             // 
             this.interceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.interceptButton.Location = new System.Drawing.Point(129, 231);
+            this.interceptButton.Enabled = false;
+            this.interceptButton.Location = new System.Drawing.Point(129, 230);
             this.interceptButton.Name = "interceptButton";
             this.interceptButton.Size = new System.Drawing.Size(75, 23);
             this.interceptButton.TabIndex = 5;
             this.interceptButton.Text = "Intercept";
             this.interceptButton.UseVisualStyleBackColor = true;
-            this.interceptButton.Click += new System.EventHandler(this.button3_Click);
+            this.interceptButton.Click += new System.EventHandler(this.interceptButton_Click);
             // 
-            // startButton
+            // onlineOfflineButton
             // 
-            this.startButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.startButton.Location = new System.Drawing.Point(48, 231);
-            this.startButton.Name = "startButton";
-            this.startButton.Size = new System.Drawing.Size(75, 23);
-            this.startButton.TabIndex = 3;
-            this.startButton.Text = "Start";
-            this.startButton.UseVisualStyleBackColor = true;
-            this.startButton.Click += new System.EventHandler(this.button1_Click);
+            this.onlineOfflineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.onlineOfflineButton.Location = new System.Drawing.Point(48, 230);
+            this.onlineOfflineButton.Name = "onlineOfflineButton";
+            this.onlineOfflineButton.Size = new System.Drawing.Size(75, 23);
+            this.onlineOfflineButton.TabIndex = 3;
+            this.onlineOfflineButton.Text = "Online";
+            this.onlineOfflineButton.UseVisualStyleBackColor = true;
+            this.onlineOfflineButton.Click += new System.EventHandler(this.onlineOfflineButton_Click);
             // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 267);
+            this.label1.Location = new System.Drawing.Point(14, 266);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(0, 12);
             this.label1.TabIndex = 2;
@@ -153,9 +156,9 @@
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar1.Enabled = false;
-            this.progressBar1.Location = new System.Drawing.Point(12, 283);
+            this.progressBar1.Location = new System.Drawing.Point(12, 282);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(514, 23);
+            this.progressBar1.Size = new System.Drawing.Size(522, 23);
             this.progressBar1.TabIndex = 1;
             // 
             // queueingUrls
@@ -168,14 +171,14 @@
             this.queueingUrls.Multiline = true;
             this.queueingUrls.Name = "queueingUrls";
             this.queueingUrls.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.queueingUrls.Size = new System.Drawing.Size(514, 213);
+            this.queueingUrls.Size = new System.Drawing.Size(536, 212);
             this.queueingUrls.TabIndex = 0;
             // 
             // statusIndicator
             // 
             this.statusIndicator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.statusIndicator.BackColor = System.Drawing.Color.Red;
-            this.statusIndicator.Location = new System.Drawing.Point(13, 232);
+            this.statusIndicator.Location = new System.Drawing.Point(13, 231);
             this.statusIndicator.Name = "statusIndicator";
             this.statusIndicator.Size = new System.Drawing.Size(20, 20);
             this.statusIndicator.TabIndex = 10;
@@ -192,14 +195,26 @@
             this.outputTextBox.Name = "outputTextBox";
             this.outputTextBox.ReadOnly = true;
             this.outputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.outputTextBox.Size = new System.Drawing.Size(514, 194);
+            this.outputTextBox.Size = new System.Drawing.Size(536, 197);
             this.outputTextBox.TabIndex = 0;
             this.outputTextBox.WordWrap = false;
             // 
             // pollingTimer
             // 
             this.pollingTimer.Interval = 1000;
-            this.pollingTimer.Tick += new System.EventHandler(this.timer1_Tick);
+            this.pollingTimer.Tick += new System.EventHandler(this.pollingTimer_Tick);
+            // 
+            // cancelDLButton
+            // 
+            this.cancelDLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cancelDLButton.Enabled = false;
+            this.cancelDLButton.Location = new System.Drawing.Point(210, 230);
+            this.cancelDLButton.Name = "cancelDLButton";
+            this.cancelDLButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelDLButton.TabIndex = 11;
+            this.cancelDLButton.Text = "Cancel DL";
+            this.cancelDLButton.UseVisualStyleBackColor = true;
+            this.cancelDLButton.Click += new System.EventHandler(this.cancelDLButton_Click);
             // 
             // downloadWorker
             // 
@@ -211,7 +226,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(540, 543);
+            this.ClientSize = new System.Drawing.Size(562, 551);
             this.Controls.Add(this.splitContainer1);
             this.Name = "NicoCacheDriverForm";
             this.Text = "NicoCacheDriver";
@@ -231,7 +246,7 @@
 
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button interceptButton;
-        private System.Windows.Forms.Button startButton;
+        private System.Windows.Forms.Button onlineOfflineButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.TextBox queueingUrls;
@@ -243,6 +258,7 @@
         private System.Windows.Forms.CheckBox downloadableTimeEnabled;
         private System.Windows.Forms.DateTimePicker downloadableTimeEnd;
         private System.Windows.Forms.Panel statusIndicator;
+        private System.Windows.Forms.Button cancelDLButton;
     }
 }
 

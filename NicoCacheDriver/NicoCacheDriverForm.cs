@@ -157,9 +157,7 @@ namespace Hazychill.NicoCacheDriver {
                 if (autoStart) {
                     Action startTimer = delegate {
                         pollingTimer.Start();
-                        startButton.Text = "Stop";
-                        label1.Enabled = true;
-                        progressBar1.Enabled = true;
+                        onlineOfflineButton.Text = "Offline";
                     };
                     this.Invoke(startTimer);
                 }
@@ -222,26 +220,40 @@ namespace Hazychill.NicoCacheDriver {
             label1.Text = string.Empty;
             progressBar1.Value = 0; ;
             interrapting = false;
+
+            interceptButton.Enabled = false;
+            cancelDLButton.Enabled = false;
         }
 
-        private void button1_Click(object sender, EventArgs e) {
-            if (pollingTimer.Enabled == false) {
-                startButton.Text = "Stop";
-                label1.Enabled = true;
-                progressBar1.Enabled = true;
-                pollingTimer.Start();
+        private void onlineOfflineButton_Click(object sender, EventArgs e) {
+            if (pollingTimer.Enabled) {
+                pollingTimer.Stop();
+                onlineOfflineButton.Enabled = true;
+                onlineOfflineButton.Text = "Online";
+                statusIndicator.BackColor = Color.Gray;
+                interceptButton.Enabled = false;
+                if (downloadWorker.IsBusy) {
+                    cancelDLButton.Enabled = true;
+                }
+                else {
+                    cancelDLButton.Enabled = false;
+                }
             }
             else {
-                startButton.Text = "Start";
-                label1.Enabled = false;
-                progressBar1.Enabled = false;
-                pollingTimer.Stop();
-                downloadWorker.CancelAsync();
-                statusIndicator.BackColor = Color.Red;
+                pollingTimer.Start();
+                onlineOfflineButton.Enabled = true;
+                onlineOfflineButton.Text = "Offline";
+                if (downloadWorker.IsBusy) {
+                    interceptButton.Enabled = true;
+                }
+                else {
+                    interceptButton.Enabled = false;
+                }
+                cancelDLButton.Enabled = false;
             }
         }
 
-        private void timer1_Tick(object sender, EventArgs e) {
+        private void pollingTimer_Tick(object sender, EventArgs e) {
             if (IsInTime()) {
                 statusIndicator.BackColor = Color.Lime;
                 if (!downloadWorker.IsBusy) {
@@ -249,14 +261,11 @@ namespace Hazychill.NicoCacheDriver {
                 }
             }
             else {
-                statusIndicator.BackColor = Color.Gray;
+                statusIndicator.BackColor = Color.Red;
             }
         }
 
         private void StartDownload() {
-            startButton.Enabled = false;
-            interceptButton.Enabled = false;
-
             workingUrl = null;
             string[] lines = WithEditQueueingUrls(delegate(string[] currentLines) {
                 List<string> newLines = new List<string>();
@@ -279,8 +288,7 @@ namespace Hazychill.NicoCacheDriver {
 
             if (workingUrl == null) {
                 queueingUrls.ReadOnly = false;
-                interceptButton.Enabled = true;
-                startButton.Enabled = true;
+                onlineOfflineButton.Enabled = true;
                 return;
             }
 
@@ -289,13 +297,11 @@ namespace Hazychill.NicoCacheDriver {
                 smng.AddItem("url", line);
             }
 
-            interceptButton.Enabled = true;
-            startButton.Enabled = true;
-
             downloadWorker.WatchUrl = workingUrl;
             downloadWorker.DownloadAsync(null);
             label1.Text = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
             progressBar1.Value = 0;
+            interceptButton.Enabled = true;
         }
 
         private bool IsValidWatchUrl(string line) {
@@ -342,14 +348,14 @@ namespace Hazychill.NicoCacheDriver {
                 pollingTimer.Stop();
                 label1.Enabled = false;
                 queueingUrls.Enabled = false;
-                startButton.Enabled = false;
+                onlineOfflineButton.Enabled = false;
                 interceptButton.Enabled = false;
                 MessageBox.Show("Failed to save settings file");
                 MessageBox.Show(e.ToString());
             }
         }
 
-        private void button3_Click(object sender, EventArgs e) {
+        private void interceptButton_Click(object sender, EventArgs e) {
             pollingTimer.Stop();
 
             if (downloadWorker.IsBusy) {
@@ -399,7 +405,7 @@ namespace Hazychill.NicoCacheDriver {
             }
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e) {
+        private void downloadableTimeEnabled_CheckedChanged(object sender, EventArgs e) {
             if (downloadableTimeEnabled.Checked) {
                 downloadableTimeStart.Enabled = true;
                 downloadableTimeEnd.Enabled = true;
@@ -428,6 +434,11 @@ namespace Hazychill.NicoCacheDriver {
             }
             //queueingUrls.Enabled = true;
             return newLines;
+        }
+
+        private void cancelDLButton_Click(object sender, EventArgs e) {
+            cancelDLButton.Enabled = false;
+            downloadWorker.CancelAsync();
         }
     }
 }
