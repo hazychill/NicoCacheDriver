@@ -1,5 +1,5 @@
 ﻿namespace Hazychill.NicoCacheDriver {
-    partial class nicoCacheDriverForm {
+    partial class NicoCacheDriverForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>

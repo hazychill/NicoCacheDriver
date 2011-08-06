@@ -12,7 +12,7 @@ namespace Hazychill.NicoCacheDriver {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new nicoCacheDriverForm());
+            Application.Run(new NicoCacheDriverForm());
         }
     }
 }

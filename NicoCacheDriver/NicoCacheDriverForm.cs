@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
 using System.Diagnostics.Contracts;
 
 namespace Hazychill.NicoCacheDriver {
-    public partial class nicoCacheDriverForm : Form {
+    public partial class NicoCacheDriverForm : Form {
         private const string NEWLINE = "\r\n";
 
         bool settingsLoaded;
@@ -26,7 +26,7 @@ namespace Hazychill.NicoCacheDriver {
         bool interrapting;
         bool isClosing;
 
-        public nicoCacheDriverForm() {
+        public NicoCacheDriverForm() {
             InitializeComponent();
             settingsLoaded = false;
             isClosing = false;
