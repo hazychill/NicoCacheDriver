@@ -34,6 +34,235 @@ namespace Hazychill.NicoCacheDriver {
             this.settingsFilePath = settingsFilePath;
         }
 
+
+        #region Event handlers
+
+        private void Form1_Shown(object sender, EventArgs e) {
+            foreach (Control c in Controls) {
+                c.Enabled = false;
+            }
+            Text = "NicoCacheDriver (Loading settings...)";
+            outputTextBox.AppendText(string.Format("Using : {0}\r\n", GetSettingsFilePath()));
+            Action action = LoadSettings;
+            action.BeginInvoke(delegate(IAsyncResult result) {
+                Action action2 = delegate {
+                    if (settingsLoaded) {
+                        foreach (Control c in Controls) {
+                            c.Enabled = true;
+                        }
+                        Text = "NicoCacheDriver";
+                    }
+                    else {
+                        Text = "NicoCacheDriver (Loading settings failed!)";
+                    }
+                    bool timeEnabled;
+                    if (!smng.TryGetItem("timeEnabled", out timeEnabled)) {
+                        timeEnabled = false;
+                    }
+                    downloadableTimeEnabled.Checked = timeEnabled;
+                    if (timeEnabled) {
+                        downloadableTimeStart.Enabled = true;
+                        downloadableTimeEnd.Enabled = true;
+                    }
+                    else {
+                        downloadableTimeStart.Enabled = false;
+                        downloadableTimeEnd.Enabled = false;
+                    }
+                    DateTime start;
+                    if (smng.TryGetItem("start", out start)) {
+                        downloadableTimeStart.Value = start;
+                    }
+                    DateTime end;
+                    if (smng.TryGetItem("end", out end)) {
+                        downloadableTimeEnd.Value = end;
+                    }
+                };
+                this.Invoke(action2);
+                bool autoStart;
+                if (!smng.TryGetItem<bool>("autoStart", out autoStart)) {
+                    autoStart = false;
+                }
+                if (autoStart) {
+                    Action startTimer = delegate {
+                        pollingTimer.Start();
+                        onlineOfflineButton.Text = "Offline";
+                    };
+                    this.Invoke(startTimer);
+                }
+
+                action.EndInvoke(result);
+            }, null);
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
+            isClosing = true;
+            this.Hide();
+
+            smng.RemoveAll<string>("url");
+            var lineQuery = queueingUrls.Lines
+                .Where(x => Regex.IsMatch(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$"))
+                .Select(x => Regex.Match(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$").Groups[1].Value);
+            foreach (string line in lineQuery) {
+                smng.AddItem("url", line);
+            }
+
+            pollingTimer.Stop();
+            if (downloadWorker.IsBusy) {
+                smng.AddItem("url", downloadWorker.WatchUrl);
+                SaveSettings();
+                downloadWorker.CancelAsync();
+            }
+            else {
+                SaveSettings();
+            }
+            while (downloadWorker.IsBusy) {
+                Thread.Sleep(1 * 1000);
+            }
+        }
+
+        private void downloadWorker1_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
+            if (progressBar1.Maximum != e.TotalBytesToReceive) {
+                progressBar1.Maximum = (int)e.TotalBytesToReceive;
+            }
+            progressBar1.Value = (int)e.BytesReceived;
+            string id = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
+            if (e.WillWait > 0) {
+                label1.Text = string.Format("{0} (waiting {1}s)", id, e.WillWait / 1000.0);
+            }
+            else if (e.Title != null) {
+                label1.Text = string.Format("{0} ({1}/{2}) {3}", id, e.BytesReceived, e.TotalBytesToReceive, e.Title);
+            }
+            else {
+                label1.Text = string.Format("{0} ({1}/{2})", id, e.BytesReceived, e.TotalBytesToReceive);
+            }
+            workingTitle = e.Title;
+        }
+
+        private void downloadWorker1_DownloadCompleted(object sender, AsyncCompletedEventArgs e) {
+            if (isClosing) {
+                return;
+            }
+            string msg;
+            if (e.Error != null) {
+                if (e.Cancelled == true) {
+                    msg = "Error     ";
+                }
+                else {
+                    msg = "Error     ";
+                }
+            }
+            else {
+                if (e.Cancelled == true) {
+                    msg = "Canceled  ";
+                }
+                else {
+                    msg = "Completed ";
+                }
+            }
+
+            if (e.Cancelled && !interrapting) {
+                WithEditQueueingUrls(delegate(string[] currentLines) {
+                    return currentLines.Concat(Enumerable.Repeat(workingUrl, 1)).ToArray();
+                });
+                label1.Text = string.Empty;
+                progressBar1.Value = 0;
+            }
+            outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl));
+            if (workingTitle != null) {
+                outputTextBox.AppendText(string.Format("          {0}\r\n", workingTitle));
+            }
+            label1.Text = string.Empty;
+            progressBar1.Value = 0; ;
+            interrapting = false;
+
+            interceptButton.Enabled = false;
+            cancelDLButton.Enabled = false;
+        }
+
+        private void pollingTimer_Tick(object sender, EventArgs e) {
+            if (IsInTime()) {
+                statusIndicator.BackColor = Color.Lime;
+                if (!downloadWorker.IsBusy) {
+                    StartDownload();
+                }
+            }
+            else {
+                statusIndicator.BackColor = Color.Red;
+            }
+        }
+
+        private void onlineOfflineButton_Click(object sender, EventArgs e) {
+            if (pollingTimer.Enabled) {
+                pollingTimer.Stop();
+                onlineOfflineButton.Enabled = true;
+                onlineOfflineButton.Text = "Online";
+                statusIndicator.BackColor = Color.Gray;
+                interceptButton.Enabled = false;
+                if (downloadWorker.IsBusy) {
+                    cancelDLButton.Enabled = true;
+                }
+                else {
+                    cancelDLButton.Enabled = false;
+                }
+            }
+            else {
+                pollingTimer.Start();
+                onlineOfflineButton.Enabled = true;
+                onlineOfflineButton.Text = "Offline";
+                if (downloadWorker.IsBusy) {
+                    interceptButton.Enabled = true;
+                }
+                else {
+                    interceptButton.Enabled = false;
+                }
+                cancelDLButton.Enabled = false;
+            }
+        }
+
+        private void interceptButton_Click(object sender, EventArgs e) {
+            pollingTimer.Stop();
+
+            if (downloadWorker.IsBusy) {
+                string interraptedUrl = workingUrl;
+                WithEditQueueingUrls(delegate(string[] currentLines) {
+                    if (currentLines.Length >= 1) {
+                        List<string> newLines = new List<string>(currentLines);
+                        newLines.Insert(newLines.Count-1, interraptedUrl);
+                        return newLines.ToArray();
+                    }
+                    else {
+                        return currentLines;
+                    }
+                });
+                interrapting = true;
+                downloadWorker.CancelAsync();
+            }
+            else {
+            }
+
+            pollingTimer.Start();
+        }
+
+        private void cancelDLButton_Click(object sender, EventArgs e) {
+            cancelDLButton.Enabled = false;
+            downloadWorker.CancelAsync();
+        }
+
+        private void downloadableTimeEnabled_CheckedChanged(object sender, EventArgs e) {
+            if (downloadableTimeEnabled.Checked) {
+                downloadableTimeStart.Enabled = true;
+                downloadableTimeEnd.Enabled = true;
+            }
+            else {
+                downloadableTimeStart.Enabled = false;
+                downloadableTimeEnd.Enabled = false;
+            }
+        }
+
+        #endregion
+
+        #region Private methods
+
         private void LoadSettings() {
             try {
                 string settingsFilePath = GetSettingsFilePath();
@@ -109,162 +338,6 @@ namespace Hazychill.NicoCacheDriver {
             return userSession;
         }
 
-        private void Form1_Shown(object sender, EventArgs e) {
-            foreach (Control c in Controls) {
-                c.Enabled = false;
-            }
-            Text = "NicoCacheDriver (Loading settings...)";
-            outputTextBox.AppendText(string.Format("Using : {0}\r\n", GetSettingsFilePath()));
-            Action action = LoadSettings;
-            action.BeginInvoke(delegate(IAsyncResult result) {
-                Action action2 = delegate {
-                    if (settingsLoaded) {
-                        foreach (Control c in Controls) {
-                            c.Enabled = true;
-                        }
-                        Text = "NicoCacheDriver";
-                    }
-                    else {
-                        Text = "NicoCacheDriver (Loading settings failed!)";
-                    }
-                    bool timeEnabled;
-                    if (!smng.TryGetItem("timeEnabled", out timeEnabled)) {
-                        timeEnabled = false;
-                    }
-                    downloadableTimeEnabled.Checked = timeEnabled;
-                    if (timeEnabled) {
-                        downloadableTimeStart.Enabled = true;
-                        downloadableTimeEnd.Enabled = true;
-                    }
-                    else {
-                        downloadableTimeStart.Enabled = false;
-                        downloadableTimeEnd.Enabled = false;
-                    }
-                    DateTime start;
-                    if (smng.TryGetItem("start", out start)) {
-                        downloadableTimeStart.Value = start;
-                    }
-                    DateTime end;
-                    if (smng.TryGetItem("end", out end)) {
-                        downloadableTimeEnd.Value = end;
-                    }
-                };
-                this.Invoke(action2);
-                bool autoStart;
-                if (!smng.TryGetItem<bool>("autoStart", out autoStart)) {
-                    autoStart = false;
-                }
-                if (autoStart) {
-                    Action startTimer = delegate {
-                        pollingTimer.Start();
-                        onlineOfflineButton.Text = "Offline";
-                    };
-                    this.Invoke(startTimer);
-                }
-
-                action.EndInvoke(result);
-            }, null);
-        }
-
-        private void downloadWorker1_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
-            if (progressBar1.Maximum != e.TotalBytesToReceive) {
-                progressBar1.Maximum = (int)e.TotalBytesToReceive;
-            }
-            progressBar1.Value = (int)e.BytesReceived;
-            string id = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
-            if (e.WillWait > 0) {
-                label1.Text = string.Format("{0} (waiting {1}s)", id, e.WillWait / 1000.0);
-            }
-            else if (e.Title != null) {
-                label1.Text = string.Format("{0} ({1}/{2}) {3}", id, e.BytesReceived, e.TotalBytesToReceive, e.Title);
-            }
-            else {
-                label1.Text = string.Format("{0} ({1}/{2})", id, e.BytesReceived, e.TotalBytesToReceive);
-            }
-            workingTitle = e.Title;
-        }
-
-        private void downloadWorker1_DownloadCompleted(object sender, AsyncCompletedEventArgs e) {
-            if (isClosing) {
-                return;
-            }
-            string msg;
-            if (e.Error != null) {
-                if (e.Cancelled == true) {
-                    msg = "Error     ";
-                }
-                else {
-                    msg = "Error     ";
-                }
-            }
-            else { 
-                if (e.Cancelled == true) {
-                    msg = "Canceled  ";
-                }
-                else {
-                    msg = "Completed ";
-                }
-            }
-
-            if (e.Cancelled && !interrapting) {
-                WithEditQueueingUrls(delegate(string[] currentLines) {
-                    return currentLines.Concat(Enumerable.Repeat(workingUrl, 1)).ToArray();
-                });
-                label1.Text = string.Empty;
-                progressBar1.Value = 0;
-            }
-            outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl));
-            if (workingTitle != null) {
-                outputTextBox.AppendText(string.Format("          {0}\r\n", workingTitle));
-            }
-            label1.Text = string.Empty;
-            progressBar1.Value = 0; ;
-            interrapting = false;
-
-            interceptButton.Enabled = false;
-            cancelDLButton.Enabled = false;
-        }
-
-        private void onlineOfflineButton_Click(object sender, EventArgs e) {
-            if (pollingTimer.Enabled) {
-                pollingTimer.Stop();
-                onlineOfflineButton.Enabled = true;
-                onlineOfflineButton.Text = "Online";
-                statusIndicator.BackColor = Color.Gray;
-                interceptButton.Enabled = false;
-                if (downloadWorker.IsBusy) {
-                    cancelDLButton.Enabled = true;
-                }
-                else {
-                    cancelDLButton.Enabled = false;
-                }
-            }
-            else {
-                pollingTimer.Start();
-                onlineOfflineButton.Enabled = true;
-                onlineOfflineButton.Text = "Offline";
-                if (downloadWorker.IsBusy) {
-                    interceptButton.Enabled = true;
-                }
-                else {
-                    interceptButton.Enabled = false;
-                }
-                cancelDLButton.Enabled = false;
-            }
-        }
-
-        private void pollingTimer_Tick(object sender, EventArgs e) {
-            if (IsInTime()) {
-                statusIndicator.BackColor = Color.Lime;
-                if (!downloadWorker.IsBusy) {
-                    StartDownload();
-                }
-            }
-            else {
-                statusIndicator.BackColor = Color.Red;
-            }
-        }
-
         private void StartDownload() {
             workingUrl = null;
             string[] lines = WithEditQueueingUrls(delegate(string[] currentLines) {
@@ -318,7 +391,7 @@ namespace Hazychill.NicoCacheDriver {
                 string startTime = downloadableTimeStart.Value.ToString("HHmmss");
                 string endTime = downloadableTimeEnd.Value.ToString("HHmmss");
                 string nowTime = DateTime.Now.ToString("HHmmss");
-                if (startTime.CompareTo(endTime) < 0) { 
+                if (startTime.CompareTo(endTime) < 0) {
                     isInTime = ((startTime.CompareTo(nowTime) < 0) && (nowTime.CompareTo(endTime) < 0));
                 }
                 else {
@@ -355,67 +428,6 @@ namespace Hazychill.NicoCacheDriver {
             }
         }
 
-        private void interceptButton_Click(object sender, EventArgs e) {
-            pollingTimer.Stop();
-
-            if (downloadWorker.IsBusy) {
-                string interraptedUrl = workingUrl;
-                WithEditQueueingUrls(delegate(string[] currentLines) {
-                    if (currentLines.Length >= 1) {
-                        List<string> newLines = new List<string>(currentLines);
-                        newLines.Insert(newLines.Count-1, interraptedUrl);
-                        return newLines.ToArray();
-                    }
-                    else {
-                        return currentLines;
-                    }
-                });
-                interrapting = true;
-                downloadWorker.CancelAsync();
-            }
-            else { 
-            }
-
-            pollingTimer.Start();
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
-            isClosing = true;
-            this.Hide();
-
-            smng.RemoveAll<string>("url");
-            var lineQuery = queueingUrls.Lines
-                .Where(x => Regex.IsMatch(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$"))
-                .Select(x => Regex.Match(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$").Groups[1].Value);
-            foreach (string line in lineQuery) {
-                smng.AddItem("url", line);
-            }
-
-            pollingTimer.Stop();
-            if (downloadWorker.IsBusy) {
-                smng.AddItem("url", downloadWorker.WatchUrl);
-                SaveSettings();
-                downloadWorker.CancelAsync();
-            }
-            else {
-                SaveSettings();
-            }
-            while (downloadWorker.IsBusy) {
-                Thread.Sleep(1 * 1000);
-            }
-        }
-
-        private void downloadableTimeEnabled_CheckedChanged(object sender, EventArgs e) {
-            if (downloadableTimeEnabled.Checked) {
-                downloadableTimeStart.Enabled = true;
-                downloadableTimeEnd.Enabled = true;
-            }
-            else {
-                downloadableTimeStart.Enabled = false;
-                downloadableTimeEnd.Enabled = false;
-            }
-        }
-
         private string[] WithEditQueueingUrls(Func<string[], string[]> editMethod) {
             //queueingUrls.Enabled = false;
             string textBefore = queueingUrls.Text;
@@ -436,9 +448,7 @@ namespace Hazychill.NicoCacheDriver {
             return newLines;
         }
 
-        private void cancelDLButton_Click(object sender, EventArgs e) {
-            cancelDLButton.Enabled = false;
-            downloadWorker.CancelAsync();
-        }
+        #endregion
+
     }
 }

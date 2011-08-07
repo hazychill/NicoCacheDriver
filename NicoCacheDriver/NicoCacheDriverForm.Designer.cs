@@ -25,19 +25,19 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.cancelDLButton = new System.Windows.Forms.Button();
+            this.interceptButton = new System.Windows.Forms.Button();
+            this.onlineOfflineButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.downloadableTimeEnabled = new System.Windows.Forms.CheckBox();
             this.downloadableTimeEnd = new System.Windows.Forms.DateTimePicker();
             this.downloadableTimeStart = new System.Windows.Forms.DateTimePicker();
-            this.interceptButton = new System.Windows.Forms.Button();
-            this.onlineOfflineButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.queueingUrls = new System.Windows.Forms.TextBox();
             this.statusIndicator = new System.Windows.Forms.Panel();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
-            this.cancelDLButton = new System.Windows.Forms.Button();
             this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -75,6 +75,41 @@
             this.splitContainer1.Size = new System.Drawing.Size(562, 551);
             this.splitContainer1.SplitterDistance = 317;
             this.splitContainer1.TabIndex = 4;
+            // 
+            // cancelDLButton
+            // 
+            this.cancelDLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cancelDLButton.Enabled = false;
+            this.cancelDLButton.Location = new System.Drawing.Point(210, 230);
+            this.cancelDLButton.Name = "cancelDLButton";
+            this.cancelDLButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelDLButton.TabIndex = 11;
+            this.cancelDLButton.Text = "Cancel DL";
+            this.cancelDLButton.UseVisualStyleBackColor = true;
+            this.cancelDLButton.Click += new System.EventHandler(this.cancelDLButton_Click);
+            // 
+            // interceptButton
+            // 
+            this.interceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.interceptButton.Enabled = false;
+            this.interceptButton.Location = new System.Drawing.Point(129, 230);
+            this.interceptButton.Name = "interceptButton";
+            this.interceptButton.Size = new System.Drawing.Size(75, 23);
+            this.interceptButton.TabIndex = 5;
+            this.interceptButton.Text = "Intercept";
+            this.interceptButton.UseVisualStyleBackColor = true;
+            this.interceptButton.Click += new System.EventHandler(this.interceptButton_Click);
+            // 
+            // onlineOfflineButton
+            // 
+            this.onlineOfflineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.onlineOfflineButton.Location = new System.Drawing.Point(48, 230);
+            this.onlineOfflineButton.Name = "onlineOfflineButton";
+            this.onlineOfflineButton.Size = new System.Drawing.Size(75, 23);
+            this.onlineOfflineButton.TabIndex = 3;
+            this.onlineOfflineButton.Text = "Online";
+            this.onlineOfflineButton.UseVisualStyleBackColor = true;
+            this.onlineOfflineButton.Click += new System.EventHandler(this.onlineOfflineButton_Click);
             // 
             // label2
             // 
@@ -119,29 +154,6 @@
             this.downloadableTimeStart.TabIndex = 6;
             this.downloadableTimeStart.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             // 
-            // interceptButton
-            // 
-            this.interceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.interceptButton.Enabled = false;
-            this.interceptButton.Location = new System.Drawing.Point(129, 230);
-            this.interceptButton.Name = "interceptButton";
-            this.interceptButton.Size = new System.Drawing.Size(75, 23);
-            this.interceptButton.TabIndex = 5;
-            this.interceptButton.Text = "Intercept";
-            this.interceptButton.UseVisualStyleBackColor = true;
-            this.interceptButton.Click += new System.EventHandler(this.interceptButton_Click);
-            // 
-            // onlineOfflineButton
-            // 
-            this.onlineOfflineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.onlineOfflineButton.Location = new System.Drawing.Point(48, 230);
-            this.onlineOfflineButton.Name = "onlineOfflineButton";
-            this.onlineOfflineButton.Size = new System.Drawing.Size(75, 23);
-            this.onlineOfflineButton.TabIndex = 3;
-            this.onlineOfflineButton.Text = "Online";
-            this.onlineOfflineButton.UseVisualStyleBackColor = true;
-            this.onlineOfflineButton.Click += new System.EventHandler(this.onlineOfflineButton_Click);
-            // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -177,7 +189,7 @@
             // statusIndicator
             // 
             this.statusIndicator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.statusIndicator.BackColor = System.Drawing.Color.Red;
+            this.statusIndicator.BackColor = System.Drawing.Color.Gray;
             this.statusIndicator.Location = new System.Drawing.Point(13, 231);
             this.statusIndicator.Name = "statusIndicator";
             this.statusIndicator.Size = new System.Drawing.Size(20, 20);
@@ -203,18 +215,6 @@
             // 
             this.pollingTimer.Interval = 1000;
             this.pollingTimer.Tick += new System.EventHandler(this.pollingTimer_Tick);
-            // 
-            // cancelDLButton
-            // 
-            this.cancelDLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cancelDLButton.Enabled = false;
-            this.cancelDLButton.Location = new System.Drawing.Point(210, 230);
-            this.cancelDLButton.Name = "cancelDLButton";
-            this.cancelDLButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelDLButton.TabIndex = 11;
-            this.cancelDLButton.Text = "Cancel DL";
-            this.cancelDLButton.UseVisualStyleBackColor = true;
-            this.cancelDLButton.Click += new System.EventHandler(this.cancelDLButton_Click);
             // 
             // downloadWorker
             // 
