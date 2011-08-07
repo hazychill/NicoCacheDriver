@@ -170,7 +170,7 @@
             this.progressBar1.Enabled = false;
             this.progressBar1.Location = new System.Drawing.Point(12, 282);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(522, 23);
+            this.progressBar1.Size = new System.Drawing.Size(536, 23);
             this.progressBar1.TabIndex = 1;
             // 
             // queueingUrls
