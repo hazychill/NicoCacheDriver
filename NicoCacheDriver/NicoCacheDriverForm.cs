@@ -34,7 +34,6 @@ namespace Hazychill.NicoCacheDriver {
             this.settingsFilePath = settingsFilePath;
         }
 
-
         #region Event handlers
 
         private void Form1_Shown(object sender, EventArgs e) {
@@ -60,14 +59,6 @@ namespace Hazychill.NicoCacheDriver {
                         timeEnabled = false;
                     }
                     downloadableTimeEnabled.Checked = timeEnabled;
-                    if (timeEnabled) {
-                        downloadableTimeStart.Enabled = true;
-                        downloadableTimeEnd.Enabled = true;
-                    }
-                    else {
-                        downloadableTimeStart.Enabled = false;
-                        downloadableTimeEnd.Enabled = false;
-                    }
                     DateTime start;
                     if (smng.TryGetItem("start", out start)) {
                         downloadableTimeStart.Value = start;
@@ -249,14 +240,6 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void downloadableTimeEnabled_CheckedChanged(object sender, EventArgs e) {
-            if (downloadableTimeEnabled.Checked) {
-                downloadableTimeStart.Enabled = true;
-                downloadableTimeEnd.Enabled = true;
-            }
-            else {
-                downloadableTimeStart.Enabled = false;
-                downloadableTimeEnd.Enabled = false;
-            }
         }
 
         #endregion
