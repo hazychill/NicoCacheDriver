@@ -25,6 +25,7 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.onlineController = new System.Windows.Forms.CheckBox();
             this.cancelDLButton = new System.Windows.Forms.Button();
             this.interceptButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -37,7 +38,6 @@
             this.statusIndicator = new System.Windows.Forms.Panel();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
-            this.onlineController = new System.Windows.Forms.CheckBox();
             this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -75,6 +75,20 @@
             this.splitContainer1.Size = new System.Drawing.Size(562, 551);
             this.splitContainer1.SplitterDistance = 317;
             this.splitContainer1.TabIndex = 4;
+            // 
+            // onlineController
+            // 
+            this.onlineController.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.onlineController.Appearance = System.Windows.Forms.Appearance.Button;
+            this.onlineController.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.onlineController.Location = new System.Drawing.Point(48, 230);
+            this.onlineController.Name = "onlineController";
+            this.onlineController.Size = new System.Drawing.Size(75, 23);
+            this.onlineController.TabIndex = 10;
+            this.onlineController.Text = "Online";
+            this.onlineController.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.onlineController.UseVisualStyleBackColor = true;
+            this.onlineController.Click += new System.EventHandler(this.onlineOfflineButton_Click);
             // 
             // cancelDLButton
             // 
@@ -173,6 +187,7 @@
             this.queueingUrls.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.queueingUrls.Size = new System.Drawing.Size(536, 212);
             this.queueingUrls.TabIndex = 0;
+            this.queueingUrls.WordWrap = false;
             // 
             // statusIndicator
             // 
@@ -203,20 +218,6 @@
             // 
             this.pollingTimer.Interval = 1000;
             this.pollingTimer.Tick += new System.EventHandler(this.pollingTimer_Tick);
-            // 
-            // onlineController
-            // 
-            this.onlineController.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.onlineController.Appearance = System.Windows.Forms.Appearance.Button;
-            this.onlineController.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.onlineController.Location = new System.Drawing.Point(48, 230);
-            this.onlineController.Name = "onlineController";
-            this.onlineController.Size = new System.Drawing.Size(75, 23);
-            this.onlineController.TabIndex = 10;
-            this.onlineController.Text = "Online";
-            this.onlineController.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.onlineController.UseVisualStyleBackColor = true;
-            this.onlineController.Click += new System.EventHandler(this.onlineOfflineButton_Click);
             // 
             // downloadWorker
             // 
