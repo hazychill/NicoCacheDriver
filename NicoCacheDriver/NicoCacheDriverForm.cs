@@ -140,7 +140,7 @@ namespace Hazychill.NicoCacheDriver {
             else {
                 label1.Text = string.Format("{0} ({1}/{2})", id, e.BytesReceived, e.TotalBytesToReceive);
             }
-            if (!string.IsNullOrEmpty(workingUrl.Comment)) {
+            if (string.IsNullOrEmpty(workingUrl.Comment) && e.Title != null) {
                 workingUrl = workingUrl.SetComment(e.Title);
             }
         }
