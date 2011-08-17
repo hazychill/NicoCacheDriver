@@ -94,6 +94,7 @@
     <Compile Include="NicoAccessTimer.cs" />
     <Compile Include="NicoCacheDriverProgressChangedEventArgs.cs" />
     <Compile Include="NicoWaitInfo.cs" />
+    <Compile Include="OnelineVideoInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="NicoCacheDriverForm.resx">

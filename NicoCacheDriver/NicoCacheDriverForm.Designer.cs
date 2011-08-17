@@ -119,7 +119,6 @@
             this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
             this.downloadableTimeEnabled.TabIndex = 40;
             this.downloadableTimeEnabled.UseVisualStyleBackColor = true;
-            this.downloadableTimeEnabled.CheckedChanged += new System.EventHandler(this.downloadableTimeEnabled_CheckedChanged);
             // 
             // downloadableTimeEnd
             // 

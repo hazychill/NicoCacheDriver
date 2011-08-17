@@ -20,8 +20,7 @@ namespace Hazychill.NicoCacheDriver {
         private const string NEWLINE = "\r\n";
 
         bool settingsLoaded;
-        string workingUrl;
-        string workingTitle;
+        OnelineVideoInfo workingUrl;
         SettingsManager smng;
         bool interrapting;
         bool isClosing;
@@ -102,8 +101,10 @@ namespace Hazychill.NicoCacheDriver {
 
             smng.RemoveAll<string>("url");
             var lineQuery = queueingUrls.Lines
-                .Where(x => Regex.IsMatch(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$"))
-                .Select(x => Regex.Match(x, "^\\s*(http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+)\\s*$").Groups[1].Value);
+                .SkipWhile(x => string.IsNullOrEmpty(x))
+                .Reverse()
+                .SkipWhile(x => string.IsNullOrEmpty(x))
+                .Reverse();
             foreach (string line in lineQuery) {
                 smng.AddItem("url", line);
             }
@@ -123,11 +124,13 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void downloadWorker1_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
+            Contract.Requires(workingUrl.IsValid);
+
             if (progressBar1.Maximum != e.TotalBytesToReceive) {
                 progressBar1.Maximum = (int)e.TotalBytesToReceive;
             }
             progressBar1.Value = (int)e.BytesReceived;
-            string id = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
+            string id = workingUrl.Id;
             if (e.WillWait > 0) {
                 label1.Text = string.Format("{0} (waiting {1}s)", id, e.WillWait / 1000.0);
             }
@@ -137,7 +140,9 @@ namespace Hazychill.NicoCacheDriver {
             else {
                 label1.Text = string.Format("{0} ({1}/{2})", id, e.BytesReceived, e.TotalBytesToReceive);
             }
-            workingTitle = e.Title;
+            if (!string.IsNullOrEmpty(workingUrl.Comment)) {
+                workingUrl = workingUrl.SetComment(e.Title);
+            }
         }
 
         private void downloadWorker1_DownloadCompleted(object sender, AsyncCompletedEventArgs e) {
@@ -164,14 +169,14 @@ namespace Hazychill.NicoCacheDriver {
 
             if (e.Cancelled && !interrapting) {
                 WithEditQueueingUrls(delegate(string[] currentLines) {
-                    return currentLines.Concat(Enumerable.Repeat(workingUrl, 1)).ToArray();
+                    return currentLines.Concat(Enumerable.Repeat(workingUrl.ToString(), 1)).ToArray();
                 });
                 label1.Text = string.Empty;
                 progressBar1.Value = 0;
             }
-            outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl));
-            if (workingTitle != null) {
-                outputTextBox.AppendText(string.Format("          {0}\r\n", workingTitle));
+            outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl.Id));
+            if (!string.IsNullOrEmpty(workingUrl.Comment)) {
+                outputTextBox.AppendText(string.Format("          {0}\r\n", workingUrl.Comment));
             }
             label1.Text = string.Empty;
             progressBar1.Value = 0; ;
@@ -227,7 +232,7 @@ namespace Hazychill.NicoCacheDriver {
             pollingTimer.Stop();
 
             if (downloadWorker.IsBusy) {
-                string interraptedUrl = workingUrl;
+                string interraptedUrl = workingUrl.ToString();
                 WithEditQueueingUrls(delegate(string[] currentLines) {
                     if (currentLines.Length >= 1) {
                         List<string> newLines = new List<string>(currentLines);
@@ -250,9 +255,6 @@ namespace Hazychill.NicoCacheDriver {
         private void cancelDLButton_Click(object sender, EventArgs e) {
             cancelDLButton.Enabled = false;
             downloadWorker.CancelAsync();
-        }
-
-        private void downloadableTimeEnabled_CheckedChanged(object sender, EventArgs e) {
         }
 
         private void NicoCacheDriverForm_Resize(object sender, EventArgs e) {
@@ -355,27 +357,39 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void StartDownload() {
-            workingUrl = null;
+            string nextUrl = null;
             string[] lines = WithEditQueueingUrls(delegate(string[] currentLines) {
-                List<string> newLines = new List<string>();
-                int index = currentLines.Length - 1;
-                for (; index >= 0; index--) {
-                    string line = currentLines[index];
-                    if (IsValidWatchUrl(line)) {
-                        workingUrl = line;
-                        break;
+                List<OnelineVideoInfo> newLines = new List<OnelineVideoInfo>();
+
+                var query = currentLines
+                    .SkipWhile(x => string.IsNullOrEmpty(x))
+                    .Reverse()
+                    .SkipWhile(x => string.IsNullOrEmpty(x))
+                    .Select(x => OnelineVideoInfo.FromString(x));
+
+                foreach (var line in query) {
+                    if (nextUrl == null) {
+                        if (line.IsValid) {
+                            nextUrl = line.ToString();
+                        }
+                        else {
+                            newLines.Insert(0, line);
+                        }
                     }
                     else {
-                        newLines.Insert(0, line);
+                        newLines.Add(line);
                     }
                 }
-                for (int i = 0; i <= index-1; i++) {
-                    newLines.Add(currentLines[i]);
-                }
-                return newLines.ToArray();
+
+                return newLines
+                    .Select(x => x.ToString())
+                    .ToArray();
             });
 
-            if (workingUrl == null) {
+            if (nextUrl != null) {
+                workingUrl = OnelineVideoInfo.FromString(nextUrl);
+            }
+            else {
                 queueingUrls.ReadOnly = false;
                 onlineController.Enabled = true;
                 return;
@@ -386,16 +400,11 @@ namespace Hazychill.NicoCacheDriver {
                 smng.AddItem("url", line);
             }
 
-            downloadWorker.WatchUrl = workingUrl;
+            downloadWorker.WatchUrl = workingUrl.Url;
             downloadWorker.DownloadAsync(null);
-            label1.Text = workingUrl.Replace("http://www.nicovideo.jp/watch/", string.Empty);
+            label1.Text = workingUrl.Id;
             progressBar1.Value = 0;
             interceptButton.Enabled = true;
-        }
-
-        private bool IsValidWatchUrl(string line) {
-            // ^\s*(http://www\.nicovideo\.jp/watch/(?:[a-z][a-z])?\d+)\s*$
-            return Regex.IsMatch(line, "^http://www\\.nicovideo\\.jp/watch/(?:[a-z][a-z])?\\d+$");
         }
 
         private bool IsInTime() {
