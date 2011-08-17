@@ -27,7 +27,6 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cancelDLButton = new System.Windows.Forms.Button();
             this.interceptButton = new System.Windows.Forms.Button();
-            this.onlineOfflineButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.downloadableTimeEnabled = new System.Windows.Forms.CheckBox();
             this.downloadableTimeEnd = new System.Windows.Forms.DateTimePicker();
@@ -38,6 +37,7 @@
             this.statusIndicator = new System.Windows.Forms.Panel();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
+            this.onlineController = new System.Windows.Forms.CheckBox();
             this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -55,9 +55,9 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.onlineController);
             this.splitContainer1.Panel1.Controls.Add(this.cancelDLButton);
             this.splitContainer1.Panel1.Controls.Add(this.interceptButton);
-            this.splitContainer1.Panel1.Controls.Add(this.onlineOfflineButton);
             this.splitContainer1.Panel1.Controls.Add(this.label2);
             this.splitContainer1.Panel1.Controls.Add(this.downloadableTimeEnabled);
             this.splitContainer1.Panel1.Controls.Add(this.downloadableTimeEnd);
@@ -83,7 +83,7 @@
             this.cancelDLButton.Location = new System.Drawing.Point(210, 230);
             this.cancelDLButton.Name = "cancelDLButton";
             this.cancelDLButton.Size = new System.Drawing.Size(75, 23);
-            this.cancelDLButton.TabIndex = 11;
+            this.cancelDLButton.TabIndex = 30;
             this.cancelDLButton.Text = "Cancel DL";
             this.cancelDLButton.UseVisualStyleBackColor = true;
             this.cancelDLButton.Click += new System.EventHandler(this.cancelDLButton_Click);
@@ -95,21 +95,10 @@
             this.interceptButton.Location = new System.Drawing.Point(129, 230);
             this.interceptButton.Name = "interceptButton";
             this.interceptButton.Size = new System.Drawing.Size(75, 23);
-            this.interceptButton.TabIndex = 5;
+            this.interceptButton.TabIndex = 20;
             this.interceptButton.Text = "Intercept";
             this.interceptButton.UseVisualStyleBackColor = true;
             this.interceptButton.Click += new System.EventHandler(this.interceptButton_Click);
-            // 
-            // onlineOfflineButton
-            // 
-            this.onlineOfflineButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.onlineOfflineButton.Location = new System.Drawing.Point(48, 230);
-            this.onlineOfflineButton.Name = "onlineOfflineButton";
-            this.onlineOfflineButton.Size = new System.Drawing.Size(75, 23);
-            this.onlineOfflineButton.TabIndex = 3;
-            this.onlineOfflineButton.Text = "Online";
-            this.onlineOfflineButton.UseVisualStyleBackColor = true;
-            this.onlineOfflineButton.Click += new System.EventHandler(this.onlineOfflineButton_Click);
             // 
             // label2
             // 
@@ -128,7 +117,7 @@
             this.downloadableTimeEnabled.Location = new System.Drawing.Point(334, 235);
             this.downloadableTimeEnabled.Name = "downloadableTimeEnabled";
             this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
-            this.downloadableTimeEnabled.TabIndex = 8;
+            this.downloadableTimeEnabled.TabIndex = 40;
             this.downloadableTimeEnabled.UseVisualStyleBackColor = true;
             this.downloadableTimeEnabled.CheckedChanged += new System.EventHandler(this.downloadableTimeEnabled_CheckedChanged);
             // 
@@ -140,7 +129,7 @@
             this.downloadableTimeEnd.Name = "downloadableTimeEnd";
             this.downloadableTimeEnd.ShowUpDown = true;
             this.downloadableTimeEnd.Size = new System.Drawing.Size(89, 19);
-            this.downloadableTimeEnd.TabIndex = 7;
+            this.downloadableTimeEnd.TabIndex = 60;
             this.downloadableTimeEnd.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             // 
             // downloadableTimeStart
@@ -151,7 +140,7 @@
             this.downloadableTimeStart.Name = "downloadableTimeStart";
             this.downloadableTimeStart.ShowUpDown = true;
             this.downloadableTimeStart.Size = new System.Drawing.Size(89, 19);
-            this.downloadableTimeStart.TabIndex = 6;
+            this.downloadableTimeStart.TabIndex = 50;
             this.downloadableTimeStart.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             // 
             // label1
@@ -208,13 +197,27 @@
             this.outputTextBox.ReadOnly = true;
             this.outputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.outputTextBox.Size = new System.Drawing.Size(536, 197);
-            this.outputTextBox.TabIndex = 0;
+            this.outputTextBox.TabIndex = 70;
             this.outputTextBox.WordWrap = false;
             // 
             // pollingTimer
             // 
             this.pollingTimer.Interval = 1000;
             this.pollingTimer.Tick += new System.EventHandler(this.pollingTimer_Tick);
+            // 
+            // onlineController
+            // 
+            this.onlineController.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.onlineController.Appearance = System.Windows.Forms.Appearance.Button;
+            this.onlineController.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.onlineController.Location = new System.Drawing.Point(48, 230);
+            this.onlineController.Name = "onlineController";
+            this.onlineController.Size = new System.Drawing.Size(75, 23);
+            this.onlineController.TabIndex = 10;
+            this.onlineController.Text = "Online";
+            this.onlineController.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.onlineController.UseVisualStyleBackColor = true;
+            this.onlineController.Click += new System.EventHandler(this.onlineOfflineButton_Click);
             // 
             // downloadWorker
             // 
@@ -247,7 +250,6 @@
 
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Button interceptButton;
-        private System.Windows.Forms.Button onlineOfflineButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.TextBox queueingUrls;
@@ -260,6 +262,7 @@
         private System.Windows.Forms.DateTimePicker downloadableTimeEnd;
         private System.Windows.Forms.Panel statusIndicator;
         private System.Windows.Forms.Button cancelDLButton;
+        private System.Windows.Forms.CheckBox onlineController;
     }
 }
 

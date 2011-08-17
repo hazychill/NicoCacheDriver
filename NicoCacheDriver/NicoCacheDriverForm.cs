@@ -77,13 +77,18 @@ namespace Hazychill.NicoCacheDriver {
                 if (!smng.TryGetItem<bool>("autoStart", out autoStart)) {
                     autoStart = false;
                 }
-                if (autoStart) {
-                    Action startTimer = delegate {
+                Action startTimer = delegate {
+                    if (autoStart) {
                         pollingTimer.Start();
-                        onlineOfflineButton.Text = "Offline";
-                    };
-                    this.Invoke(startTimer);
-                }
+                        onlineController.Checked = true;
+                        onlineController.Text = "Online";
+                    }
+                    else {
+                        onlineController.Checked = false;
+                        onlineController.Text = "Offline";
+                    }
+                };
+                this.Invoke(startTimer);
 
                 action.EndInvoke(result);
             }, null);
@@ -189,8 +194,9 @@ namespace Hazychill.NicoCacheDriver {
         private void onlineOfflineButton_Click(object sender, EventArgs e) {
             if (pollingTimer.Enabled) {
                 pollingTimer.Stop();
-                onlineOfflineButton.Enabled = true;
-                onlineOfflineButton.Text = "Online";
+                onlineController.Enabled = true;
+                onlineController.Checked = false;
+                onlineController.Text = "Offline";
                 statusIndicator.BackColor = Color.Gray;
                 interceptButton.Enabled = false;
                 if (downloadWorker.IsBusy) {
@@ -202,8 +208,9 @@ namespace Hazychill.NicoCacheDriver {
             }
             else {
                 pollingTimer.Start();
-                onlineOfflineButton.Enabled = true;
-                onlineOfflineButton.Text = "Offline";
+                onlineController.Enabled = true;
+                onlineController.Text = "Online";
+                onlineController.Checked = true;
                 if (downloadWorker.IsBusy) {
                     interceptButton.Enabled = true;
                 }
@@ -368,7 +375,7 @@ namespace Hazychill.NicoCacheDriver {
 
             if (workingUrl == null) {
                 queueingUrls.ReadOnly = false;
-                onlineOfflineButton.Enabled = true;
+                onlineController.Enabled = true;
                 return;
             }
 
@@ -430,7 +437,7 @@ namespace Hazychill.NicoCacheDriver {
                 pollingTimer.Stop();
                 label1.Enabled = false;
                 queueingUrls.Enabled = false;
-                onlineOfflineButton.Enabled = false;
+                onlineController.Enabled = false;
                 interceptButton.Enabled = false;
                 MessageBox.Show("Failed to save settings file");
                 MessageBox.Show(e.ToString());
