@@ -87,6 +87,8 @@ namespace Hazychill.NicoCacheDriver {
                         onlineController.Checked = false;
                         onlineController.Text = "Offline";
                     }
+
+                    queueingUrls.Focus();
                 };
                 this.Invoke(startTimer);
 
