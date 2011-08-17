@@ -26,12 +26,16 @@ namespace Hazychill.NicoCacheDriver {
         bool interrapting;
         bool isClosing;
         string settingsFilePath;
+        FormWindowState lastWindowState;
+        Size lastSize;
 
         public NicoCacheDriverForm(string settingsFilePath) {
             InitializeComponent();
             settingsLoaded = false;
             isClosing = false;
             this.settingsFilePath = settingsFilePath;
+            lastWindowState = this.WindowState;
+            lastSize = this.Size;
         }
 
         #region Event handlers
@@ -242,6 +246,13 @@ namespace Hazychill.NicoCacheDriver {
         private void downloadableTimeEnabled_CheckedChanged(object sender, EventArgs e) {
         }
 
+        private void NicoCacheDriverForm_Resize(object sender, EventArgs e) {
+            lastWindowState = this.WindowState;
+            if (this.WindowState == FormWindowState.Normal) {
+                lastSize = this.Size;
+            }
+        }
+
         #endregion
 
         #region Private methods
@@ -254,6 +265,18 @@ namespace Hazychill.NicoCacheDriver {
                                       new FlexibleConverter<Regex>(regex => regex.ToString(),
                                                                    str => new Regex(str)));
                 smng.Load(settingsFilePath);
+
+                this.Invoke(new Action(delegate {
+                    Size size;
+                    if (smng.TryGetItem("size", out size)) {
+                        this.Size = size;
+                    }
+
+                    FormWindowState windowState;
+                    if (smng.TryGetItem("windowState", out windowState)) {
+                        this.WindowState = windowState;
+                    }
+                }));
 
                 NicoAccessTimer timer = new NicoAccessTimer(smng);
 
@@ -278,6 +301,7 @@ namespace Hazychill.NicoCacheDriver {
                             .ToArray();
                     });
                     outputTextBox.AppendText(string.Format("User session: {0}\r\n", userSession));
+
                 };
                 this.Invoke(action);
 
@@ -391,6 +415,8 @@ namespace Hazychill.NicoCacheDriver {
                 smng.SetOrAddNewItem("timeEnabled", downloadableTimeEnabled.Checked);
                 smng.SetOrAddNewItem("start", downloadableTimeStart.Value.ToUniversalTime());
                 smng.SetOrAddNewItem("end", downloadableTimeEnd.Value.ToUniversalTime());
+                smng.SetOrAddNewItem("windowState", lastWindowState);
+                smng.SetOrAddNewItem("size", lastSize);
                 string tempPathForNewSettngsFile = Path.GetTempFileName();
                 string tempPathForOldSettngsFile = Path.GetTempFileName();
                 File.Delete(tempPathForNewSettngsFile);
