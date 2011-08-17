@@ -367,17 +367,19 @@ namespace Hazychill.NicoCacheDriver {
                     .SkipWhile(x => string.IsNullOrEmpty(x))
                     .Select(x => OnelineVideoInfo.FromString(x));
 
+                int index = 0;
                 foreach (var line in query) {
                     if (nextUrl == null) {
                         if (line.IsValid) {
                             nextUrl = line.ToString();
                         }
                         else {
+                            index++;
                             newLines.Insert(0, line);
                         }
                     }
                     else {
-                        newLines.Add(line);
+                        newLines.Insert(index, line);
                     }
                 }
 
