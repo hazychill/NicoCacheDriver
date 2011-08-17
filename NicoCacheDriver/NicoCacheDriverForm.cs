@@ -174,7 +174,7 @@ namespace Hazychill.NicoCacheDriver {
                 label1.Text = string.Empty;
                 progressBar1.Value = 0;
             }
-            outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl.Id));
+            outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl.Url));
             if (!string.IsNullOrEmpty(workingUrl.Comment)) {
                 outputTextBox.AppendText(string.Format("          {0}\r\n", workingUrl.Comment));
             }
