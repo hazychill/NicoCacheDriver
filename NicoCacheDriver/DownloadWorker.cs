@@ -16,7 +16,6 @@ namespace Hazychill.NicoCacheDriver {
         private IWebProxy proxy;
         private AsyncOperation asyncOp;
         private object asyncOpLock = new object();
-        private bool cancellationPending;
 
         public event DownloadProgressChangedEventHandler DownloadProgressChanged;
         public event AsyncCompletedEventHandler DownloadCompleted;
@@ -24,6 +23,7 @@ namespace Hazychill.NicoCacheDriver {
         public string WatchUrl { get; set; }
         public NicoAccessTimer Timer { get; private set; }
         public bool IsBusy { get; private set; }
+        public bool CancellationPending { get; private set; }
 
         public DownloadWorker() {
             IsBusy = false;
@@ -211,13 +211,13 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void CheckCancelled() {
-            if (cancellationPending) {
+            if (CancellationPending) {
                 throw new CancelException();
             }
         }
 
         public void CancelAsync() {
-            cancellationPending = true;
+            CancellationPending = true;
         }
 
         public void DownloadAsync(object userState) {
@@ -228,7 +228,7 @@ namespace Hazychill.NicoCacheDriver {
                 asyncOp = AsyncOperationManager.CreateOperation(userState);
             }
 
-            cancellationPending = false;
+            CancellationPending = false;
             IsBusy = true;
 
             ParameterizedThreadStart start = DownloadThreadStart;

@@ -206,7 +206,7 @@ namespace Hazychill.NicoCacheDriver {
                 onlineController.Text = "Offline";
                 statusIndicator.BackColor = Color.Gray;
                 interceptButton.Enabled = false;
-                if (downloadWorker.IsBusy) {
+                if (downloadWorker.IsBusy && downloadWorker.CancellationPending == false) {
                     cancelDLButton.Enabled = true;
                 }
                 else {
