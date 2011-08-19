@@ -38,6 +38,7 @@
             this.statusIndicator = new System.Windows.Forms.Panel();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
+            this.exitButton = new System.Windows.Forms.Button();
             this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -70,10 +71,11 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.exitButton);
             this.splitContainer1.Panel2.Controls.Add(this.outputTextBox);
             this.splitContainer1.Panel2MinSize = 0;
-            this.splitContainer1.Size = new System.Drawing.Size(562, 551);
-            this.splitContainer1.SplitterDistance = 317;
+            this.splitContainer1.Size = new System.Drawing.Size(565, 553);
+            this.splitContainer1.SplitterDistance = 307;
             this.splitContainer1.TabIndex = 4;
             // 
             // onlineController
@@ -81,7 +83,7 @@
             this.onlineController.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.onlineController.Appearance = System.Windows.Forms.Appearance.Button;
             this.onlineController.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.onlineController.Location = new System.Drawing.Point(48, 230);
+            this.onlineController.Location = new System.Drawing.Point(48, 220);
             this.onlineController.Name = "onlineController";
             this.onlineController.Size = new System.Drawing.Size(75, 23);
             this.onlineController.TabIndex = 10;
@@ -94,7 +96,7 @@
             // 
             this.cancelDLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cancelDLButton.Enabled = false;
-            this.cancelDLButton.Location = new System.Drawing.Point(210, 230);
+            this.cancelDLButton.Location = new System.Drawing.Point(210, 220);
             this.cancelDLButton.Name = "cancelDLButton";
             this.cancelDLButton.Size = new System.Drawing.Size(75, 23);
             this.cancelDLButton.TabIndex = 30;
@@ -106,7 +108,7 @@
             // 
             this.interceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.interceptButton.Enabled = false;
-            this.interceptButton.Location = new System.Drawing.Point(129, 230);
+            this.interceptButton.Location = new System.Drawing.Point(129, 220);
             this.interceptButton.Name = "interceptButton";
             this.interceptButton.Size = new System.Drawing.Size(75, 23);
             this.interceptButton.TabIndex = 20;
@@ -118,7 +120,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(442, 235);
+            this.label2.Location = new System.Drawing.Point(445, 225);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(11, 12);
             this.label2.TabIndex = 9;
@@ -128,7 +130,7 @@
             // 
             this.downloadableTimeEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnabled.AutoSize = true;
-            this.downloadableTimeEnabled.Location = new System.Drawing.Point(334, 235);
+            this.downloadableTimeEnabled.Location = new System.Drawing.Point(337, 225);
             this.downloadableTimeEnabled.Name = "downloadableTimeEnabled";
             this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
             this.downloadableTimeEnabled.TabIndex = 40;
@@ -138,7 +140,7 @@
             // 
             this.downloadableTimeEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnd.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeEnd.Location = new System.Drawing.Point(453, 232);
+            this.downloadableTimeEnd.Location = new System.Drawing.Point(456, 222);
             this.downloadableTimeEnd.Name = "downloadableTimeEnd";
             this.downloadableTimeEnd.ShowUpDown = true;
             this.downloadableTimeEnd.Size = new System.Drawing.Size(89, 19);
@@ -149,7 +151,7 @@
             // 
             this.downloadableTimeStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeStart.Location = new System.Drawing.Point(351, 232);
+            this.downloadableTimeStart.Location = new System.Drawing.Point(354, 222);
             this.downloadableTimeStart.Name = "downloadableTimeStart";
             this.downloadableTimeStart.ShowUpDown = true;
             this.downloadableTimeStart.Size = new System.Drawing.Size(89, 19);
@@ -160,7 +162,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 266);
+            this.label1.Location = new System.Drawing.Point(14, 256);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(0, 12);
             this.label1.TabIndex = 2;
@@ -170,9 +172,9 @@
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar1.Enabled = false;
-            this.progressBar1.Location = new System.Drawing.Point(12, 282);
+            this.progressBar1.Location = new System.Drawing.Point(12, 272);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(536, 23);
+            this.progressBar1.Size = new System.Drawing.Size(539, 23);
             this.progressBar1.TabIndex = 1;
             // 
             // queueingUrls
@@ -185,7 +187,7 @@
             this.queueingUrls.Multiline = true;
             this.queueingUrls.Name = "queueingUrls";
             this.queueingUrls.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.queueingUrls.Size = new System.Drawing.Size(536, 212);
+            this.queueingUrls.Size = new System.Drawing.Size(539, 202);
             this.queueingUrls.TabIndex = 0;
             this.queueingUrls.WordWrap = false;
             // 
@@ -193,7 +195,7 @@
             // 
             this.statusIndicator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.statusIndicator.BackColor = System.Drawing.Color.Gray;
-            this.statusIndicator.Location = new System.Drawing.Point(13, 231);
+            this.statusIndicator.Location = new System.Drawing.Point(13, 221);
             this.statusIndicator.Name = "statusIndicator";
             this.statusIndicator.Size = new System.Drawing.Size(20, 20);
             this.statusIndicator.TabIndex = 10;
@@ -210,7 +212,7 @@
             this.outputTextBox.Name = "outputTextBox";
             this.outputTextBox.ReadOnly = true;
             this.outputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.outputTextBox.Size = new System.Drawing.Size(536, 197);
+            this.outputTextBox.Size = new System.Drawing.Size(539, 188);
             this.outputTextBox.TabIndex = 70;
             this.outputTextBox.WordWrap = false;
             // 
@@ -218,6 +220,17 @@
             // 
             this.pollingTimer.Interval = 1000;
             this.pollingTimer.Tick += new System.EventHandler(this.pollingTimer_Tick);
+            // 
+            // exitButton
+            // 
+            this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.exitButton.Location = new System.Drawing.Point(477, 206);
+            this.exitButton.Name = "exitButton";
+            this.exitButton.Size = new System.Drawing.Size(75, 23);
+            this.exitButton.TabIndex = 71;
+            this.exitButton.Text = "Exit";
+            this.exitButton.UseVisualStyleBackColor = true;
+            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
             // 
             // downloadWorker
             // 
@@ -229,7 +242,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(562, 551);
+            this.ClientSize = new System.Drawing.Size(565, 553);
             this.Controls.Add(this.splitContainer1);
             this.Name = "NicoCacheDriverForm";
             this.Text = "NicoCacheDriver";
@@ -263,6 +276,7 @@
         private System.Windows.Forms.Panel statusIndicator;
         private System.Windows.Forms.Button cancelDLButton;
         private System.Windows.Forms.CheckBox onlineController;
+        private System.Windows.Forms.Button exitButton;
     }
 }
 

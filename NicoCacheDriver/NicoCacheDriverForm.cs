@@ -40,22 +40,23 @@ namespace Hazychill.NicoCacheDriver {
         #region Event handlers
 
         private void Form1_Shown(object sender, EventArgs e) {
-            foreach (Control c in Controls) {
-                c.Enabled = false;
-            }
+            SetAllControlEnabledStatus(false);
             Text = "NicoCacheDriver (Loading settings...)";
             outputTextBox.AppendText(string.Format("Using : {0}\r\n", GetSettingsFilePath()));
             Action action = LoadSettings;
             action.BeginInvoke(delegate(IAsyncResult result) {
                 Action action2 = delegate {
                     if (settingsLoaded) {
-                        foreach (Control c in Controls) {
-                            c.Enabled = true;
-                        }
+                        SetAllControlEnabledStatus(true);
+                        interceptButton.Enabled = false;
+                        cancelDLButton.Enabled = false;
                         Text = "NicoCacheDriver";
                     }
                     else {
                         Text = "NicoCacheDriver (Loading settings failed!)";
+                        splitContainer1.Enabled = true;
+                        splitContainer1.Panel2.Enabled = true;
+                        exitButton.Enabled = true;
                     }
                     bool timeEnabled;
                     if (!smng.TryGetItem("timeEnabled", out timeEnabled)) {
@@ -262,6 +263,10 @@ namespace Hazychill.NicoCacheDriver {
             if (this.WindowState == FormWindowState.Normal) {
                 lastSize = this.Size;
             }
+        }
+
+        private void exitButton_Click(object sender, EventArgs e) {
+            this.Close();
         }
 
         #endregion
@@ -475,6 +480,22 @@ namespace Hazychill.NicoCacheDriver {
             }
             //queueingUrls.Enabled = true;
             return newLines;
+        }
+
+        private void SetAllControlEnabledStatus(bool enabled) {
+            ISet<Control> processedControls = new HashSet<Control>();
+            Queue<Control> queue = new Queue<Control>();
+            processedControls.Add(this);
+            queue.Enqueue(this);
+            while (queue.Count > 0) {
+                Control c = queue.Dequeue();
+                foreach (Control child in c.Controls) {
+                    if (processedControls.Add(child)) {
+                        child.Enabled = enabled;
+                        queue.Enqueue(child);
+                    }
+                }
+            }
         }
 
         #endregion
