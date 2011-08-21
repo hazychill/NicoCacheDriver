@@ -346,6 +346,11 @@ namespace Hazychill.NicoCacheDriver {
             }), null);
         }
 
+        private void queueingUrls_TextChanged(object sender, EventArgs e) {
+            NicoAccessTimer timer = downloadWorker.Timer;
+            timer.UpdateLastAccess("urn:uuid:45755c6f-01e2-4a38-6f5c-7545e201384a");
+        }
+
         #endregion
 
         #region Private methods
@@ -440,6 +445,11 @@ namespace Hazychill.NicoCacheDriver {
 
         private void StartDownload() {
             string nextUrl = null;
+
+            if (!downloadWorker.Timer.CanAccess("urn:uuid:45755c6f-01e2-4a38-6f5c-7545e201384a")) {
+                return;
+            }
+
             string[] lines = WithEditQueueingUrls(delegate(string[] currentLines) {
                 List<OnelineVideoInfo> newLines = new List<OnelineVideoInfo>();
 
@@ -604,7 +614,6 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         #endregion
-
 
     }
 }

@@ -192,6 +192,7 @@
             this.queueingUrls.Size = new System.Drawing.Size(539, 180);
             this.queueingUrls.TabIndex = 0;
             this.queueingUrls.WordWrap = false;
+            this.queueingUrls.TextChanged += new System.EventHandler(this.queueingUrls_TextChanged);
             // 
             // statusIndicator
             // 

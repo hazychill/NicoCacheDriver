@@ -95,6 +95,13 @@ namespace Hazychill.NicoCacheDriver {
             return canAccess;
         }
 
+        public void UpdateLastAccess(string url) {
+            NicoWaitInfo waitInfo = GetWaitInfo(url);
+            if (waitInfo != null) {
+                waitInfo.UpdateLastAccess();
+            }
+        }
+
         private NicoWaitInfo GetWaitInfo(string url) {
             return patternMap.Keys
               .Where(timerName => patternMap[timerName]
