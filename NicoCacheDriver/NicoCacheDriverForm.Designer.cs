@@ -40,8 +40,8 @@
             this.exitButton = new System.Windows.Forms.Button();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
-            this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             this.clearButton = new System.Windows.Forms.Button();
+            this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -81,6 +81,7 @@
             this.splitContainer1.Size = new System.Drawing.Size(565, 553);
             this.splitContainer1.SplitterDistance = 285;
             this.splitContainer1.TabIndex = 4;
+            this.splitContainer1.TabStop = false;
             // 
             // onlineController
             // 
@@ -248,13 +249,6 @@
             this.pollingTimer.Interval = 1000;
             this.pollingTimer.Tick += new System.EventHandler(this.pollingTimer_Tick);
             // 
-            // downloadWorker
-            // 
-            this.downloadWorker.Timer = null;
-            this.downloadWorker.WatchUrl = null;
-            this.downloadWorker.DownloadProgressChanged += new Hazychill.NicoCacheDriver.DownloadProgressChangedEventHandler(this.downloadWorker1_DownloadProgressChanged);
-            this.downloadWorker.DownloadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.downloadWorker1_DownloadCompleted);
-            // 
             // clearButton
             // 
             this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -265,6 +259,13 @@
             this.clearButton.Text = "Clear";
             this.clearButton.UseVisualStyleBackColor = true;
             this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
+            // 
+            // downloadWorker
+            // 
+            this.downloadWorker.Timer = null;
+            this.downloadWorker.WatchUrl = null;
+            this.downloadWorker.DownloadProgressChanged += new Hazychill.NicoCacheDriver.DownloadProgressChangedEventHandler(this.downloadWorker1_DownloadProgressChanged);
+            this.downloadWorker.DownloadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.downloadWorker1_DownloadCompleted);
             // 
             // NicoCacheDriverForm
             // 
