@@ -190,6 +190,7 @@ namespace Hazychill.NicoCacheDriver {
             if (!string.IsNullOrEmpty(workingUrl.Comment)) {
                 OutputMessage(string.Format("          {0}", workingUrl.Comment));
             }
+            OutputLog(e.Error.ToString());
             label1.Text = string.Empty;
             progressBar1.Value = 0; ;
             interrapting = false;
@@ -628,6 +629,10 @@ namespace Hazychill.NicoCacheDriver {
         private void OutputMessage(string message) {
             outputTextBox.AppendText(message);
             outputTextBox.AppendText(NEWLINE);
+            logWriter.WriteLine("{0} {1}", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff"), message);
+        }
+
+        private void OutputLog(string message) {
             logWriter.WriteLine("{0} {1}", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff"), message);
         }
 
