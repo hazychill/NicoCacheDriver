@@ -364,6 +364,10 @@ namespace Hazychill.NicoCacheDriver {
             timer.UpdateLastAccess("urn:uuid:45755c6f-01e2-4a38-6f5c-7545e201384a");
         }
 
+        private void clearButton_Click(object sender, EventArgs e) {
+            outputTextBox.Clear();
+        }
+
         #endregion
 
         #region Private methods

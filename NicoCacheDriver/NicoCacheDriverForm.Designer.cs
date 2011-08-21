@@ -41,6 +41,7 @@
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
             this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
+            this.clearButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -72,6 +73,7 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.clearButton);
             this.splitContainer1.Panel2.Controls.Add(this.reloadSettingsButton);
             this.splitContainer1.Panel2.Controls.Add(this.exitButton);
             this.splitContainer1.Panel2.Controls.Add(this.outputTextBox);
@@ -209,7 +211,7 @@
             this.reloadSettingsButton.Location = new System.Drawing.Point(11, 228);
             this.reloadSettingsButton.Name = "reloadSettingsButton";
             this.reloadSettingsButton.Size = new System.Drawing.Size(75, 23);
-            this.reloadSettingsButton.TabIndex = 72;
+            this.reloadSettingsButton.TabIndex = 80;
             this.reloadSettingsButton.Text = "Reload";
             this.reloadSettingsButton.UseVisualStyleBackColor = true;
             this.reloadSettingsButton.Click += new System.EventHandler(this.reloadSettingsButton_Click);
@@ -220,7 +222,7 @@
             this.exitButton.Location = new System.Drawing.Point(477, 228);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 23);
-            this.exitButton.TabIndex = 71;
+            this.exitButton.TabIndex = 100;
             this.exitButton.Text = "Exit";
             this.exitButton.UseVisualStyleBackColor = true;
             this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
@@ -252,6 +254,17 @@
             this.downloadWorker.WatchUrl = null;
             this.downloadWorker.DownloadProgressChanged += new Hazychill.NicoCacheDriver.DownloadProgressChangedEventHandler(this.downloadWorker1_DownloadProgressChanged);
             this.downloadWorker.DownloadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.downloadWorker1_DownloadCompleted);
+            // 
+            // clearButton
+            // 
+            this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.clearButton.Location = new System.Drawing.Point(92, 228);
+            this.clearButton.Name = "clearButton";
+            this.clearButton.Size = new System.Drawing.Size(75, 23);
+            this.clearButton.TabIndex = 90;
+            this.clearButton.Text = "Clear";
+            this.clearButton.UseVisualStyleBackColor = true;
+            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
             // 
             // NicoCacheDriverForm
             // 
@@ -293,6 +306,7 @@
         private System.Windows.Forms.CheckBox onlineController;
         private System.Windows.Forms.Button exitButton;
         private System.Windows.Forms.Button reloadSettingsButton;
+        private System.Windows.Forms.Button clearButton;
     }
 }
 
