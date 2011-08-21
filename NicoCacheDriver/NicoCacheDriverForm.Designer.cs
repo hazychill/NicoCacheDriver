@@ -24,6 +24,7 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NicoCacheDriverForm));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.onlineController = new System.Windows.Forms.CheckBox();
             this.cancelDLButton = new System.Windows.Forms.Button();
@@ -273,6 +274,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(565, 553);
             this.Controls.Add(this.splitContainer1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "NicoCacheDriverForm";
             this.Text = "NicoCacheDriver";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
