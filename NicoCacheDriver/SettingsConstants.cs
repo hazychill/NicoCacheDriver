@@ -18,5 +18,6 @@ namespace Hazychill.NicoCacheDriver {
         public const string WINDOW_STATE = "windowState";
         public const string PROXY_HOST = "proxyHost";
         public const string PROXY_PORT = "proxyPort";
+        public const string LOG_FILE = "logFile";
     }
 }

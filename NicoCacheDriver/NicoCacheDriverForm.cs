@@ -27,6 +27,7 @@ namespace Hazychill.NicoCacheDriver {
         string settingsFilePath;
         FormWindowState lastWindowState;
         Size lastSize;
+        TextWriter logWriter;
 
         public NicoCacheDriverForm(string settingsFilePath) {
             InitializeComponent();
@@ -35,6 +36,7 @@ namespace Hazychill.NicoCacheDriver {
             this.settingsFilePath = settingsFilePath;
             lastWindowState = this.WindowState;
             lastSize = this.Size;
+            logWriter = TextWriter.Null;
         }
 
         #region Event handlers
@@ -42,7 +44,7 @@ namespace Hazychill.NicoCacheDriver {
         private void Form1_Shown(object sender, EventArgs e) {
             SetAllControlEnabledStatus(false);
             Text = "NicoCacheDriver (Loading settings...)";
-            outputTextBox.AppendText(string.Format("Using : {0}\r\n", GetSettingsFilePath()));
+            OutputMessage(string.Format("Using : {0}", GetSettingsFilePath()));
             Action action = LoadSettings;
             action.BeginInvoke(delegate(IAsyncResult result) {
                 Action action2 = delegate {
@@ -70,6 +72,13 @@ namespace Hazychill.NicoCacheDriver {
                     DateTime end;
                     if (smng.TryGetItem(SettingsConstants.END, out end)) {
                         downloadableTimeEnd.Value = end;
+                    }
+
+                    string logFile;
+                    if (smng.TryGetItem(SettingsConstants.LOG_FILE, out logFile)) {
+                        logWriter.Dispose();
+                        Stream logStream = File.Open(logFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                        logWriter = new StreamWriter(logStream, new UTF8Encoding());
                     }
                 };
                 this.Invoke(action2);
@@ -122,6 +131,8 @@ namespace Hazychill.NicoCacheDriver {
             while (downloadWorker.IsBusy) {
                 Thread.Sleep(1 * 1000);
             }
+
+            logWriter.Dispose();
         }
 
         private void downloadWorker1_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
@@ -175,9 +186,9 @@ namespace Hazychill.NicoCacheDriver {
                 label1.Text = string.Empty;
                 progressBar1.Value = 0;
             }
-            outputTextBox.AppendText(string.Format("{0}{1}\r\n", msg, workingUrl.Url));
+            OutputMessage(string.Format("{0}{1}", msg, workingUrl.Url));
             if (!string.IsNullOrEmpty(workingUrl.Comment)) {
-                outputTextBox.AppendText(string.Format("          {0}\r\n", workingUrl.Comment));
+                OutputMessage(string.Format("          {0}", workingUrl.Comment));
             }
             label1.Text = string.Empty;
             progressBar1.Value = 0; ;
@@ -316,7 +327,7 @@ namespace Hazychill.NicoCacheDriver {
                     downloadWorker.Timer = newTimer;
 
                     Action uiAction = delegate {
-                        outputTextBox.AppendText(string.Format("User session: {0}\r\n", userSession));
+                        OutputMessage(string.Format("User session: {0}", userSession));
                         RestoreAllControlEnabledStatus(enabledStateMap);
                         if (isOnline) {
                             pollingTimer.Start();
@@ -340,7 +351,8 @@ namespace Hazychill.NicoCacheDriver {
                 }
             };
 
-            outputTextBox.AppendText(string.Format("\r\nUsing : {0}\r\n", GetSettingsFilePath()));
+            OutputMessage("");
+            OutputMessage(string.Format("Using : {0}", GetSettingsFilePath()));
             loadSettingsAction.BeginInvoke(new AsyncCallback(delegate(IAsyncResult ar) {
                 loadSettingsAction.EndInvoke(ar);
             }), null);
@@ -398,7 +410,7 @@ namespace Hazychill.NicoCacheDriver {
                             .Select(x => x.Value)
                             .ToArray();
                     });
-                    outputTextBox.AppendText(string.Format("User session: {0}\r\n", userSession));
+                    OutputMessage(string.Format("User session: {0}", userSession));
 
                 };
                 this.Invoke(action);
@@ -611,6 +623,12 @@ namespace Hazychill.NicoCacheDriver {
                 bool enabled = enabledStateMap[c];
                 c.Enabled = enabled;
             }
+        }
+
+        private void OutputMessage(string message) {
+            outputTextBox.AppendText(message);
+            outputTextBox.AppendText(NEWLINE);
+            logWriter.WriteLine("{0} {1}", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff"), message);
         }
 
         #endregion
