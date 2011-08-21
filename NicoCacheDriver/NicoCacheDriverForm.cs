@@ -634,10 +634,12 @@ namespace Hazychill.NicoCacheDriver {
             outputTextBox.AppendText(message);
             outputTextBox.AppendText(NEWLINE);
             logWriter.WriteLine("{0} {1}", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff"), message);
+            logWriter.Flush();
         }
 
         private void OutputLog(string message) {
             logWriter.WriteLine("{0} {1}", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff"), message);
+            logWriter.Flush();
         }
 
         #endregion
