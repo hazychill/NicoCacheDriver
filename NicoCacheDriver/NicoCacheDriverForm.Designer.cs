@@ -106,7 +106,7 @@
             this.cancelDLButton.Name = "cancelDLButton";
             this.cancelDLButton.Size = new System.Drawing.Size(75, 23);
             this.cancelDLButton.TabIndex = 30;
-            this.cancelDLButton.Text = "Cancel DL";
+            this.cancelDLButton.Text = "Cancel";
             this.cancelDLButton.UseVisualStyleBackColor = true;
             this.cancelDLButton.Click += new System.EventHandler(this.cancelDLButton_Click);
             // 
@@ -118,7 +118,7 @@
             this.interceptButton.Name = "interceptButton";
             this.interceptButton.Size = new System.Drawing.Size(75, 23);
             this.interceptButton.TabIndex = 20;
-            this.interceptButton.Text = "Intercept";
+            this.interceptButton.Text = "Interrupt";
             this.interceptButton.UseVisualStyleBackColor = true;
             this.interceptButton.Click += new System.EventHandler(this.interceptButton_Click);
             // 
