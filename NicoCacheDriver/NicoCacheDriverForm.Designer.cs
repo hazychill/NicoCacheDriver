@@ -36,11 +36,11 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.queueingUrls = new System.Windows.Forms.TextBox();
             this.statusIndicator = new System.Windows.Forms.Panel();
+            this.clearButton = new System.Windows.Forms.Button();
             this.reloadSettingsButton = new System.Windows.Forms.Button();
             this.exitButton = new System.Windows.Forms.Button();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
-            this.clearButton = new System.Windows.Forms.Button();
             this.downloadWorker = new Hazychill.NicoCacheDriver.DownloadWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -125,7 +125,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(445, 203);
+            this.label2.Location = new System.Drawing.Point(467, 203);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(11, 12);
             this.label2.TabIndex = 9;
@@ -135,7 +135,7 @@
             // 
             this.downloadableTimeEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnabled.AutoSize = true;
-            this.downloadableTimeEnabled.Location = new System.Drawing.Point(337, 203);
+            this.downloadableTimeEnabled.Location = new System.Drawing.Point(376, 203);
             this.downloadableTimeEnabled.Name = "downloadableTimeEnabled";
             this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
             this.downloadableTimeEnabled.TabIndex = 40;
@@ -145,10 +145,10 @@
             // 
             this.downloadableTimeEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnd.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeEnd.Location = new System.Drawing.Point(456, 200);
+            this.downloadableTimeEnd.Location = new System.Drawing.Point(480, 200);
             this.downloadableTimeEnd.Name = "downloadableTimeEnd";
             this.downloadableTimeEnd.ShowUpDown = true;
-            this.downloadableTimeEnd.Size = new System.Drawing.Size(89, 19);
+            this.downloadableTimeEnd.Size = new System.Drawing.Size(71, 19);
             this.downloadableTimeEnd.TabIndex = 60;
             this.downloadableTimeEnd.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             // 
@@ -156,10 +156,10 @@
             // 
             this.downloadableTimeStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeStart.Location = new System.Drawing.Point(354, 200);
+            this.downloadableTimeStart.Location = new System.Drawing.Point(394, 200);
             this.downloadableTimeStart.Name = "downloadableTimeStart";
             this.downloadableTimeStart.ShowUpDown = true;
-            this.downloadableTimeStart.Size = new System.Drawing.Size(89, 19);
+            this.downloadableTimeStart.Size = new System.Drawing.Size(71, 19);
             this.downloadableTimeStart.TabIndex = 50;
             this.downloadableTimeStart.Value = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             // 
@@ -206,6 +206,17 @@
             this.statusIndicator.Size = new System.Drawing.Size(20, 20);
             this.statusIndicator.TabIndex = 10;
             // 
+            // clearButton
+            // 
+            this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.clearButton.Location = new System.Drawing.Point(92, 228);
+            this.clearButton.Name = "clearButton";
+            this.clearButton.Size = new System.Drawing.Size(75, 23);
+            this.clearButton.TabIndex = 90;
+            this.clearButton.Text = "Clear";
+            this.clearButton.UseVisualStyleBackColor = true;
+            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
+            // 
             // reloadSettingsButton
             // 
             this.reloadSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -248,17 +259,6 @@
             // 
             this.pollingTimer.Interval = 1000;
             this.pollingTimer.Tick += new System.EventHandler(this.pollingTimer_Tick);
-            // 
-            // clearButton
-            // 
-            this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.clearButton.Location = new System.Drawing.Point(92, 228);
-            this.clearButton.Name = "clearButton";
-            this.clearButton.Size = new System.Drawing.Size(75, 23);
-            this.clearButton.TabIndex = 90;
-            this.clearButton.Text = "Clear";
-            this.clearButton.UseVisualStyleBackColor = true;
-            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
             // 
             // downloadWorker
             // 
