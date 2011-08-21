@@ -190,7 +190,9 @@ namespace Hazychill.NicoCacheDriver {
             if (!string.IsNullOrEmpty(workingUrl.Comment)) {
                 OutputMessage(string.Format("          {0}", workingUrl.Comment));
             }
-            OutputLog(e.Error.ToString());
+            if (e.Error != null) {
+                OutputLog(e.Error.ToString());
+            }
             label1.Text = string.Empty;
             progressBar1.Value = 0; ;
             interrapting = false;
