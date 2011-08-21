@@ -59,22 +59,22 @@ namespace Hazychill.NicoCacheDriver {
                         exitButton.Enabled = true;
                     }
                     bool timeEnabled;
-                    if (!smng.TryGetItem("timeEnabled", out timeEnabled)) {
+                    if (!smng.TryGetItem(SettingsConstants.TIME_ENABLED, out timeEnabled)) {
                         timeEnabled = false;
                     }
                     downloadableTimeEnabled.Checked = timeEnabled;
                     DateTime start;
-                    if (smng.TryGetItem("start", out start)) {
+                    if (smng.TryGetItem(SettingsConstants.START, out start)) {
                         downloadableTimeStart.Value = start;
                     }
                     DateTime end;
-                    if (smng.TryGetItem("end", out end)) {
+                    if (smng.TryGetItem(SettingsConstants.END, out end)) {
                         downloadableTimeEnd.Value = end;
                     }
                 };
                 this.Invoke(action2);
                 bool autoStart;
-                if (!smng.TryGetItem<bool>("autoStart", out autoStart)) {
+                if (!smng.TryGetItem<bool>(SettingsConstants.AUTO_START, out autoStart)) {
                     autoStart = false;
                 }
                 Action startTimer = delegate {
@@ -100,19 +100,19 @@ namespace Hazychill.NicoCacheDriver {
             isClosing = true;
             this.Hide();
 
-            smng.RemoveAll<string>("url");
+            smng.RemoveAll<string>(SettingsConstants.URL);
             var lineQuery = queueingUrls.Lines
                 .SkipWhile(x => string.IsNullOrEmpty(x))
                 .Reverse()
                 .SkipWhile(x => string.IsNullOrEmpty(x))
                 .Reverse();
             foreach (string line in lineQuery) {
-                smng.AddItem("url", line);
+                smng.AddItem(SettingsConstants.URL, line);
             }
 
             pollingTimer.Stop();
             if (downloadWorker.IsBusy) {
-                smng.AddItem("url", downloadWorker.WatchUrl);
+                smng.AddItem(SettingsConstants.URL, downloadWorker.WatchUrl);
                 SaveSettings();
                 downloadWorker.CancelAsync();
             }
@@ -286,24 +286,24 @@ namespace Hazychill.NicoCacheDriver {
                     string settingsFilePath = GetSettingsFilePath();
                     newSmng.Load(settingsFilePath);
 
-                    string getnicovideousersessionfromchromium = newSmng.GetItem<string>("getnicovideousersessionfromchromium");
-                    smng.SetOrAddNewItem("getnicovideousersessionfromchromium", getnicovideousersessionfromchromium);
+                    string getnicovideousersessionfromchromium = newSmng.GetItem<string>(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM);
+                    smng.SetOrAddNewItem(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM, getnicovideousersessionfromchromium);
 
-                    foreach (SettingsItem<string> timerNameItem in smng.GetItems<string>("timerName")) {
+                    foreach (SettingsItem<string> timerNameItem in smng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
                         string timerName = timerNameItem.Value;
-                        string timerIntervalName = string.Format("timerInterval_{0}", timerName);
+                        string timerIntervalName = string.Format("{0}_{1}", SettingsConstants.TIMER_INTERVAL_PREFIX, timerName);
                         smng.RemoveAll<TimeSpan>(timerIntervalName);
-                        string timerPatternName = string.Format("timerPattern_{0}", timerName);
+                        string timerPatternName = string.Format("{0}_{1}", SettingsConstants.TIMER_PATTERN_PREFIX, timerName);
                         smng.RemoveAll<Regex>(timerPatternName);
                     }
-                    smng.RemoveAll<string>("timerName");
+                    smng.RemoveAll<string>(SettingsConstants.TIMER_NAME);
 
-                    foreach (string timerName in newSmng.GetItems<string>("timerName")) {
-                        smng.AddItem("timerName", timerName);
-                        string timerIntervalName = string.Format("timerInterval_{0}", timerName);
+                    foreach (string timerName in newSmng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
+                        smng.AddItem(SettingsConstants.TIMER_NAME, timerName);
+                        string timerIntervalName = string.Format("{0}_{1}", SettingsConstants.TIMER_INTERVAL_PREFIX, timerName);
                         TimeSpan timerInterval = newSmng.GetItem<TimeSpan>(timerIntervalName);
                         smng.AddItem(timerIntervalName, timerInterval);
-                        string timerPatternName = string.Format("timerPattern_{0}", timerName);
+                        string timerPatternName = string.Format("{0}_{1}", SettingsConstants.TIMER_PATTERN_PREFIX, timerName);
                         Regex timerPattern = newSmng.GetItem<Regex>(timerPatternName);
                         smng.AddItem(timerPatternName, timerPattern);
                     }
@@ -361,12 +361,12 @@ namespace Hazychill.NicoCacheDriver {
 
                 this.Invoke(new Action(delegate {
                     Size size;
-                    if (smng.TryGetItem("size", out size)) {
+                    if (smng.TryGetItem(SettingsConstants.SIZE, out size)) {
                         this.Size = size;
                     }
 
                     FormWindowState windowState;
-                    if (smng.TryGetItem("windowState", out windowState)) {
+                    if (smng.TryGetItem(SettingsConstants.WINDOW_STATE, out windowState)) {
                         this.WindowState = windowState;
                     }
                 }));
@@ -377,11 +377,11 @@ namespace Hazychill.NicoCacheDriver {
                 string userSession = GetUserSession(smng);
 
                 string proxyHost;
-                if (!smng.TryGetItem("proxyHost", out proxyHost)) {
+                if (!smng.TryGetItem(SettingsConstants.PROXY_HOST, out proxyHost)) {
                     proxyHost = "localhost";
                 }
                 int proxyPort;
-                if (!smng.TryGetItem("proxyPort", out proxyPort)) {
+                if (!smng.TryGetItem(SettingsConstants.PROXY_PORT, out proxyPort)) {
                     proxyPort = 8080;
                 }
 
@@ -389,7 +389,7 @@ namespace Hazychill.NicoCacheDriver {
 
                 Action action = delegate() {
                     WithEditQueueingUrls(delegate(string[] currentLines) {
-                        return smng.GetItems<string>("url")
+                        return smng.GetItems<string>(SettingsConstants.URL)
                             .Select(x => x.Value)
                             .ToArray();
                     });
@@ -420,7 +420,7 @@ namespace Hazychill.NicoCacheDriver {
 
         private string GetUserSession(SettingsManager smng) {
             string userSession;
-            string getnicovideousersessionfromchromium = smng.GetItem<string>("getnicovideousersessionfromchromium");
+            string getnicovideousersessionfromchromium = smng.GetItem<string>(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM);
             ProcessStartInfo startInfo = new ProcessStartInfo(getnicovideousersessionfromchromium);
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardOutput = true;
@@ -479,9 +479,9 @@ namespace Hazychill.NicoCacheDriver {
                 return;
             }
 
-            smng.RemoveAll<string>("url");
+            smng.RemoveAll<string>(SettingsConstants.URL);
             foreach (string line in lines) {
-                smng.AddItem("url", line);
+                smng.AddItem(SettingsConstants.URL, line);
             }
 
             reloadSettingsButton.Enabled = false;
@@ -515,11 +515,11 @@ namespace Hazychill.NicoCacheDriver {
 
         private void SaveSettings() {
             try {
-                smng.SetOrAddNewItem("timeEnabled", downloadableTimeEnabled.Checked);
-                smng.SetOrAddNewItem("start", downloadableTimeStart.Value.ToUniversalTime());
-                smng.SetOrAddNewItem("end", downloadableTimeEnd.Value.ToUniversalTime());
-                smng.SetOrAddNewItem("windowState", lastWindowState);
-                smng.SetOrAddNewItem("size", lastSize);
+                smng.SetOrAddNewItem(SettingsConstants.TIME_ENABLED, downloadableTimeEnabled.Checked);
+                smng.SetOrAddNewItem(SettingsConstants.START, downloadableTimeStart.Value.ToUniversalTime());
+                smng.SetOrAddNewItem(SettingsConstants.END, downloadableTimeEnd.Value.ToUniversalTime());
+                smng.SetOrAddNewItem(SettingsConstants.WINDOW_STATE, lastWindowState);
+                smng.SetOrAddNewItem(SettingsConstants.SIZE, lastSize);
                 string tempPathForNewSettngsFile = Path.GetTempFileName();
                 string tempPathForOldSettngsFile = Path.GetTempFileName();
                 File.Delete(tempPathForNewSettngsFile);

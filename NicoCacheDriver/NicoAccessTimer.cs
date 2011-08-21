@@ -18,8 +18,8 @@ namespace Hazychill.NicoCacheDriver {
             waitInfoMap = new Dictionary<string, NicoWaitInfo>();
             patternMap = new Dictionary<string, List<Regex>>();
 
-            foreach (string timerName in smng.GetItems<string>("timerName")) {
-                string intervalKey = string.Format("timerInterval_{0}", timerName);
+            foreach (string timerName in smng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
+                string intervalKey = string.Format("{0}_{1}", SettingsConstants.TIMER_INTERVAL_PREFIX, timerName);
                 TimeSpan interval = smng.GetItem<TimeSpan>(intervalKey);
                 NicoWaitInfo waitInfo;
                 NicoWaitInfo baseWaitInfo;
@@ -33,7 +33,7 @@ namespace Hazychill.NicoCacheDriver {
 
                 List<Regex> patternList = new List<Regex>();
                 patternMap.Add(timerName, patternList);
-                string patternKey = string.Format("timerPattern_{0}", timerName);
+                string patternKey = string.Format("{0}_{1}", SettingsConstants.TIMER_PATTERN_PREFIX, timerName);
                 foreach (Regex pattern in smng.GetItems<Regex>(patternKey)) {
                     patternList.Add(pattern);
                 }

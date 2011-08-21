@@ -97,6 +97,7 @@
     <Compile Include="OnelineVideoInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SettingsConstants.cs" />
     <EmbeddedResource Include="NicoCacheDriverForm.resx">
       <DependentUpon>NicoCacheDriverForm.cs</DependentUpon>
     </EmbeddedResource>
