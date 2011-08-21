@@ -21,7 +21,7 @@ namespace Hazychill.NicoCacheDriver {
         public event AsyncCompletedEventHandler DownloadCompleted;
 
         public string WatchUrl { get; set; }
-        public NicoAccessTimer Timer { get; private set; }
+        public NicoAccessTimer Timer { get; set; }
         public bool IsBusy { get; private set; }
         public bool CancellationPending { get; private set; }
 
@@ -286,6 +286,21 @@ namespace Hazychill.NicoCacheDriver {
             AsyncCompletedEventHandler tempHandler = DownloadCompleted;
             if (tempHandler != null) {
                 tempHandler(this, asyncCompletedEventArgs);
+            }
+        }
+
+        public void SetUserSession(string userSession) {
+            var query = cookies.GetCookies(new Uri("http://www.nicovideo.jp/watch/sm9"))
+                .Cast<Cookie>()
+                .Where(x => string.Equals(x.Name, "user_session"));
+            bool cookieExists = false;
+            foreach (Cookie cookie in query) {
+                cookieExists = true;
+                cookie.Value = userSession;
+            }
+            if (!cookieExists) {
+                Cookie cookie = new Cookie("user_session", userSession, "/", ".nicovideo.jp");
+                cookies.Add(cookie);
             }
         }
     }

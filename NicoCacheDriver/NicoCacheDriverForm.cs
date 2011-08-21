@@ -185,6 +185,7 @@ namespace Hazychill.NicoCacheDriver {
 
             interceptButton.Enabled = false;
             cancelDLButton.Enabled = false;
+            reloadUserSessionButton.Enabled = true;
         }
 
         private void pollingTimer_Tick(object sender, EventArgs e) {
@@ -267,6 +268,82 @@ namespace Hazychill.NicoCacheDriver {
 
         private void exitButton_Click(object sender, EventArgs e) {
             this.Close();
+        }
+
+        private void reloadUserSessionButton_Click(object sender, EventArgs e) {
+            bool isOnline = pollingTimer.Enabled;
+            if (isOnline) {
+                pollingTimer.Stop();
+            }
+            Dictionary<Control, bool> enabledStateMap = SetAllControlEnabledStatus(false);
+            Action loadSettingsAction = delegate {
+                SettingsManager newSmng = new SettingsManager();
+                newSmng.ConverterMap.Add(typeof(Regex),
+                                      new FlexibleConverter<Regex>(regex => regex.ToString(),
+                                                                   str => new Regex(str)));
+                try {
+                    settingsLoaded = false;
+                    string settingsFilePath = GetSettingsFilePath();
+                    newSmng.Load(settingsFilePath);
+
+                    string getnicovideousersessionfromchromium = newSmng.GetItem<string>("getnicovideousersessionfromchromium");
+                    smng.SetOrAddNewItem("getnicovideousersessionfromchromium", getnicovideousersessionfromchromium);
+
+                    foreach (SettingsItem<string> timerNameItem in smng.GetItems<string>("timerName")) {
+                        string timerName = timerNameItem.Value;
+                        string timerIntervalName = string.Format("timerInterval_{0}", timerName);
+                        smng.RemoveAll<TimeSpan>(timerIntervalName);
+                        string timerPatternName = string.Format("timerPattern_{0}", timerName);
+                        smng.RemoveAll<Regex>(timerPatternName);
+                    }
+                    smng.RemoveAll<string>("timerName");
+
+                    foreach (string timerName in newSmng.GetItems<string>("timerName")) {
+                        smng.AddItem("timerName", timerName);
+                        string timerIntervalName = string.Format("timerInterval_{0}", timerName);
+                        TimeSpan timerInterval = newSmng.GetItem<TimeSpan>(timerIntervalName);
+                        smng.AddItem(timerIntervalName, timerInterval);
+                        string timerPatternName = string.Format("timerPattern_{0}", timerName);
+                        Regex timerPattern = newSmng.GetItem<Regex>(timerPatternName);
+                        smng.AddItem(timerPatternName, timerPattern);
+                    }
+
+                    string userSession = GetUserSession(smng);
+                    downloadWorker.SetUserSession(userSession);
+
+                    NicoAccessTimer timer = downloadWorker.Timer;
+                    NicoAccessTimer newTimer = timer.DeriveNewTimer(smng);
+                    downloadWorker.Timer = newTimer;
+
+                    Action uiAction = delegate {
+                        outputTextBox.AppendText(string.Format("User session: {0}\r\n", userSession));
+                        RestoreAllControlEnabledStatus(enabledStateMap);
+                        if (isOnline) {
+                            pollingTimer.Start();
+                        }
+                    };
+                    this.Invoke(uiAction);
+                    settingsLoaded = true;
+                }
+                catch (Exception exception) {
+                    Action uiAction = delegate {
+                        onlineController.Text = "Offline";
+                        onlineController.Checked = false;
+                        statusIndicator.BackColor = Color.Gray;
+                        splitContainer1.Enabled = true;
+                        splitContainer1.Panel2.Enabled = true;
+                        exitButton.Enabled = true;
+                        outputTextBox.Enabled = true;
+                        MessageBox.Show(exception.ToString());
+                    };
+                    this.Invoke(uiAction);
+                }
+            };
+
+            outputTextBox.AppendText(string.Format("\r\nUsing : {0}\r\n", GetSettingsFilePath()));
+            loadSettingsAction.BeginInvoke(new AsyncCallback(delegate(IAsyncResult ar) {
+                loadSettingsAction.EndInvoke(ar);
+            }), null);
         }
 
         #endregion
@@ -407,6 +484,7 @@ namespace Hazychill.NicoCacheDriver {
                 smng.AddItem("url", line);
             }
 
+            reloadUserSessionButton.Enabled = false;
             downloadWorker.WatchUrl = workingUrl.Url;
             downloadWorker.DownloadAsync(null);
             label1.Text = workingUrl.Id;
@@ -482,9 +560,24 @@ namespace Hazychill.NicoCacheDriver {
             return newLines;
         }
 
-        private void SetAllControlEnabledStatus(bool enabled) {
+        private Dictionary<Control, bool> SetAllControlEnabledStatus(bool enabled) {
             ISet<Control> processedControls = new HashSet<Control>();
             Queue<Control> queue = new Queue<Control>();
+            Dictionary<Control, bool> currentEnabledStateMap = new Dictionary<Control, bool>();
+            processedControls.Add(this);
+            queue.Enqueue(this);
+            while (queue.Count > 0) {
+                Control c = queue.Dequeue();
+                foreach (Control child in c.Controls) {
+                    if (processedControls.Add(child)) {
+                        currentEnabledStateMap.Add(child, child.Enabled);
+                        queue.Enqueue(child);
+                    }
+                }
+            }
+
+            processedControls = new HashSet<Control>();
+            queue = new Queue<Control>();
             processedControls.Add(this);
             queue.Enqueue(this);
             while (queue.Count > 0) {
@@ -496,9 +589,22 @@ namespace Hazychill.NicoCacheDriver {
                     }
                 }
             }
+
+            return currentEnabledStateMap;
+        }
+
+        private void RestoreAllControlEnabledStatus(Dictionary<Control, bool> enabledStateMap) {
+            var query = enabledStateMap.Keys
+                .Where(c => c != null)
+                .Where(c => !c.IsDisposed);
+            foreach (Control c in query) {
+                bool enabled = enabledStateMap[c];
+                c.Enabled = enabled;
+            }
         }
 
         #endregion
+
 
     }
 }

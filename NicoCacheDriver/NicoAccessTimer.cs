@@ -11,14 +11,25 @@ namespace Hazychill.NicoCacheDriver {
         Dictionary<string, NicoWaitInfo> waitInfoMap;
         Dictionary<string, List<Regex>> patternMap;
 
-        public NicoAccessTimer(ISettingsManager smng) {
+        public NicoAccessTimer(ISettingsManager smng) : this(smng, null) {
+        }
+
+        private NicoAccessTimer(ISettingsManager smng, Dictionary<string, NicoWaitInfo> baseWaitInfoMap) {
             waitInfoMap = new Dictionary<string, NicoWaitInfo>();
             patternMap = new Dictionary<string, List<Regex>>();
 
             foreach (string timerName in smng.GetItems<string>("timerName")) {
                 string intervalKey = string.Format("timerInterval_{0}", timerName);
                 TimeSpan interval = smng.GetItem<TimeSpan>(intervalKey);
-                waitInfoMap.Add(timerName, new NicoWaitInfo(interval));
+                NicoWaitInfo waitInfo;
+                NicoWaitInfo baseWaitInfo;
+                if (baseWaitInfoMap != null && baseWaitInfoMap.TryGetValue(timerName, out baseWaitInfo)) {
+                    waitInfo = new NicoWaitInfo(interval, baseWaitInfo.LastAccess);
+                }
+                else {
+                    waitInfo = new NicoWaitInfo(interval);
+                }
+                waitInfoMap.Add(timerName, waitInfo);
 
                 List<Regex> patternList = new List<Regex>();
                 patternMap.Add(timerName, patternList);
@@ -91,6 +102,11 @@ namespace Hazychill.NicoCacheDriver {
                                     .Any())
               .Select(timerName => waitInfoMap[timerName])
               .FirstOrDefault();
+        }
+
+        public NicoAccessTimer DeriveNewTimer(SettingsManager smng) {
+            NicoAccessTimer timer = new NicoAccessTimer(smng, waitInfoMap);
+            return timer;
         }
     }
 }
