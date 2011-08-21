@@ -40,7 +40,7 @@ namespace Hazychill.NicoCacheDriver {
             }
         }
 
-        public int WaitBeforeAccess(string url) {
+        public int GetWaitMilliSeconds(string url) {
             int waitMillseconds;
 
             NicoWaitInfo waitInfo = GetWaitInfo(url);
@@ -53,46 +53,16 @@ namespace Hazychill.NicoCacheDriver {
                 TimeSpan accessInterval = waitInfo.Interval;
 
                 TimeSpan timeAfterLastAccess = now - last;
-                if (timeAfterLastAccess < accessInterval) {
-                    TimeSpan wait = accessInterval - timeAfterLastAccess;
-                    waitMillseconds = (int)wait.TotalMilliseconds;
-                }
-                else {
-                    waitMillseconds = 0;
-                }
-                waitInfo.UpdateLastAccess();
+                TimeSpan wait = accessInterval - timeAfterLastAccess;
+                waitMillseconds = (int)wait.TotalMilliseconds;
             }
 
             return waitMillseconds;
         }
 
         public bool CanAccess(string url) {
-            bool canAccess;
-            int waitMillseconds;
-
-            NicoWaitInfo waitInfo = GetWaitInfo(url);
-            if (waitInfo == null) {
-                canAccess = true;
-            }
-            else {
-                DateTime now = DateTime.Now;
-                DateTime last = waitInfo.LastAccess;
-                TimeSpan accessInterval = waitInfo.Interval;
-
-                TimeSpan timeAfterLastAccess = now - last;
-                if (timeAfterLastAccess < accessInterval) {
-                    TimeSpan wait = accessInterval - timeAfterLastAccess;
-                    waitMillseconds = (int)wait.TotalMilliseconds;
-                    canAccess = false;
-                }
-                else {
-                    waitMillseconds = 0;
-                    canAccess = true;
-                    waitInfo.UpdateLastAccess();
-                }
-            }
-
-            return canAccess;
+            int waitMilliSec = GetWaitMilliSeconds(url);
+            return waitMilliSec <= 0;
         }
 
         public void UpdateLastAccess(string url) {

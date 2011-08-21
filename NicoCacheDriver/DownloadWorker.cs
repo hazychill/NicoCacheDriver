@@ -72,7 +72,7 @@ namespace Hazychill.NicoCacheDriver {
 
             CheckCancelled();
 
-            int waitMilliseconds = Timer.WaitBeforeAccess(WatchUrl);
+            int waitMilliseconds = Timer.GetWaitMilliSeconds(WatchUrl);
             if (waitMilliseconds > 0) {
                 if (asyncOp != null) {
                     DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(0, 0, 0, waitMilliseconds, asyncOp.UserSuppliedState);
@@ -87,6 +87,7 @@ namespace Hazychill.NicoCacheDriver {
             using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
             using (Stream responseStream = response.GetResponseStream())
             using (TextReader reader = new StreamReader(responseStream, utf8)) {
+                Timer.UpdateLastAccess(WatchUrl);
                 responseText = reader.ReadToEnd();
             }
 
@@ -111,7 +112,7 @@ namespace Hazychill.NicoCacheDriver {
             // addVideoToDeflist\((\d+),
             string vParam = Regex.Match(responseText, "addVideoToDeflist\\((\\d+),").Groups[1].Value;
             string getflvUrl = string.Format("http://flapi.nicovideo.jp/api/getflv?v={0}", vParam);
-            waitMilliseconds = Timer.WaitBeforeAccess(getflvUrl);
+            waitMilliseconds = Timer.GetWaitMilliSeconds(getflvUrl);
             if (waitMilliseconds > 0) {
                 if (asyncOp != null) {
                     DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(0, 0, 0, waitMilliseconds, asyncOp.UserSuppliedState);
@@ -125,6 +126,7 @@ namespace Hazychill.NicoCacheDriver {
             using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
             using (Stream responseStream = response.GetResponseStream())
             using (TextReader reader = new StreamReader(responseStream, utf8)) {
+                Timer.UpdateLastAccess(getflvUrl);
                 responseText = reader.ReadToEnd();
             }
 
@@ -133,7 +135,7 @@ namespace Hazychill.NicoCacheDriver {
             // &url=([^&]+)&
             string urlRaw = Regex.Match(responseText, "&url=([^&]+)&").Groups[1].Value;
             string url = Uri.UnescapeDataString(urlRaw);
-            waitMilliseconds = Timer.WaitBeforeAccess(url);
+            waitMilliseconds = Timer.GetWaitMilliSeconds(url);
             if (waitMilliseconds > 0) {
                 if (asyncOp != null) {
                     DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(0, 0, 0, waitMilliseconds, asyncOp.UserSuppliedState);
@@ -145,6 +147,7 @@ namespace Hazychill.NicoCacheDriver {
             request.CookieContainer = cookies;
             request.Proxy = proxy;
             using (HttpWebResponse response = request.GetResponse() as HttpWebResponse) {
+                Timer.UpdateLastAccess(url);
                 long contentLength = response.ContentLength;
                 int previousPercentage = -1;
                 int percentage = 0;
@@ -174,6 +177,7 @@ namespace Hazychill.NicoCacheDriver {
                             if (canAccess) {
                                 DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(percentage, read, contentLength, title, asyncOp.UserSuppliedState);
                                 asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
+                                Timer.UpdateLastAccess("urn:uuid:ae64b59c-e55e-473b-9cb5-64ae5ee53b47");
                             }
                         }
                         CheckCancelled();
