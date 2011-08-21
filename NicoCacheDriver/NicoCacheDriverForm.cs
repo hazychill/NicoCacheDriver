@@ -185,7 +185,7 @@ namespace Hazychill.NicoCacheDriver {
 
             interceptButton.Enabled = false;
             cancelDLButton.Enabled = false;
-            reloadUserSessionButton.Enabled = true;
+            reloadSettingsButton.Enabled = true;
         }
 
         private void pollingTimer_Tick(object sender, EventArgs e) {
@@ -270,7 +270,7 @@ namespace Hazychill.NicoCacheDriver {
             this.Close();
         }
 
-        private void reloadUserSessionButton_Click(object sender, EventArgs e) {
+        private void reloadSettingsButton_Click(object sender, EventArgs e) {
             bool isOnline = pollingTimer.Enabled;
             if (isOnline) {
                 pollingTimer.Stop();
@@ -484,7 +484,7 @@ namespace Hazychill.NicoCacheDriver {
                 smng.AddItem("url", line);
             }
 
-            reloadUserSessionButton.Enabled = false;
+            reloadSettingsButton.Enabled = false;
             downloadWorker.WatchUrl = workingUrl.Url;
             downloadWorker.DownloadAsync(null);
             label1.Text = workingUrl.Id;

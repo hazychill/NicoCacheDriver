@@ -36,7 +36,7 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.queueingUrls = new System.Windows.Forms.TextBox();
             this.statusIndicator = new System.Windows.Forms.Panel();
-            this.reloadUserSessionButton = new System.Windows.Forms.Button();
+            this.reloadSettingsButton = new System.Windows.Forms.Button();
             this.exitButton = new System.Windows.Forms.Button();
             this.outputTextBox = new System.Windows.Forms.TextBox();
             this.pollingTimer = new System.Windows.Forms.Timer(this.components);
@@ -72,7 +72,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.reloadUserSessionButton);
+            this.splitContainer1.Panel2.Controls.Add(this.reloadSettingsButton);
             this.splitContainer1.Panel2.Controls.Add(this.exitButton);
             this.splitContainer1.Panel2.Controls.Add(this.outputTextBox);
             this.splitContainer1.Panel2MinSize = 0;
@@ -202,16 +202,16 @@
             this.statusIndicator.Size = new System.Drawing.Size(20, 20);
             this.statusIndicator.TabIndex = 10;
             // 
-            // reloadUserSessionButton
+            // reloadSettingsButton
             // 
-            this.reloadUserSessionButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.reloadUserSessionButton.Location = new System.Drawing.Point(11, 228);
-            this.reloadUserSessionButton.Name = "reloadUserSessionButton";
-            this.reloadUserSessionButton.Size = new System.Drawing.Size(75, 23);
-            this.reloadUserSessionButton.TabIndex = 72;
-            this.reloadUserSessionButton.Text = "Reload";
-            this.reloadUserSessionButton.UseVisualStyleBackColor = true;
-            this.reloadUserSessionButton.Click += new System.EventHandler(this.reloadUserSessionButton_Click);
+            this.reloadSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.reloadSettingsButton.Location = new System.Drawing.Point(11, 228);
+            this.reloadSettingsButton.Name = "reloadSettingsButton";
+            this.reloadSettingsButton.Size = new System.Drawing.Size(75, 23);
+            this.reloadSettingsButton.TabIndex = 72;
+            this.reloadSettingsButton.Text = "Reload";
+            this.reloadSettingsButton.UseVisualStyleBackColor = true;
+            this.reloadSettingsButton.Click += new System.EventHandler(this.reloadSettingsButton_Click);
             // 
             // exitButton
             // 
@@ -247,6 +247,7 @@
             // 
             // downloadWorker
             // 
+            this.downloadWorker.Timer = null;
             this.downloadWorker.WatchUrl = null;
             this.downloadWorker.DownloadProgressChanged += new Hazychill.NicoCacheDriver.DownloadProgressChangedEventHandler(this.downloadWorker1_DownloadProgressChanged);
             this.downloadWorker.DownloadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.downloadWorker1_DownloadCompleted);
@@ -290,7 +291,7 @@
         private System.Windows.Forms.Button cancelDLButton;
         private System.Windows.Forms.CheckBox onlineController;
         private System.Windows.Forms.Button exitButton;
-        private System.Windows.Forms.Button reloadUserSessionButton;
+        private System.Windows.Forms.Button reloadSettingsButton;
     }
 }
 
