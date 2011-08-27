@@ -191,6 +191,11 @@ namespace Hazychill.NicoCacheDriver {
                 OutputMessage(string.Format("          {0}", workingUrl.Comment));
             }
             if (e.Error != null) {
+                WithEditQueueingUrls(delegate(string[] currentLines) {
+                    return Enumerable.Repeat(string.Format(";{0}", workingUrl.ToString()), 1)
+                        .Concat(currentLines)
+                        .ToArray();
+                });
                 OutputLog(e.Error.ToString());
             }
             label1.Text = string.Empty;
