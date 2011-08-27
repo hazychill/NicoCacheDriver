@@ -111,7 +111,9 @@ namespace Hazychill.NicoCacheDriver {
 
             // addVideoToDeflist\((\d+),
             string vParam = Regex.Match(responseText, "addVideoToDeflist\\((\\d+),").Groups[1].Value;
-            string getflvUrl = string.Format("http://flapi.nicovideo.jp/api/getflv?v={0}", vParam);
+            // id:\s*'(?<nm>nm)\d+'
+            string as3Param = (Regex.Match(responseText, "id:\\s*\'(?<nm>nm)\\d+\'").Groups["nm"].Success) ? ("&as3=1") : (string.Empty);
+            string getflvUrl = string.Format("http://flapi.nicovideo.jp/api/getflv?v={0}{1}", vParam, as3Param);
             waitMilliseconds = Timer.GetWaitMilliSeconds(getflvUrl);
             if (waitMilliseconds > 0) {
                 if (asyncOp != null) {
