@@ -366,7 +366,7 @@ namespace Hazychill.NicoCacheDriver {
             }), null);
         }
 
-        private void queueingUrls_TextChanged(object sender, EventArgs e) {
+        private void queueingUrls_UpdateTimerEvent(object sender, EventArgs e) {
             NicoAccessTimer timer = downloadWorker.Timer;
             timer.UpdateLastAccess("urn:uuid:45755c6f-01e2-4a38-6f5c-7545e201384a");
         }
