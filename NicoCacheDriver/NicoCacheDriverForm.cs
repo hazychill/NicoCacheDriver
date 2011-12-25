@@ -191,7 +191,26 @@ namespace Hazychill.NicoCacheDriver {
                 OutputMessage(string.Format("          {0}", workingUrl.Comment));
             }
             if (e.Error != null) {
-                WithEditQueueingUrls(delegate(string[] currentLines) {
+                WithEditQueueingUrls(currentLines => {
+                    var retryValue = workingUrl.GetParameter("retry");
+                    int retryCount;
+                    if (int.TryParse(retryValue, out retryCount) && retryCount > 0) {
+                        retryCount--;
+                        var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry", retryCount.ToString()));
+                        return currentLines
+                            .Concat(Enumerable.Repeat(newUrl.ToString(), 1))
+                            .ToArray();
+                    }
+
+                    retryValue = workingUrl.GetParameter("retry*");
+                    if (int.TryParse(retryValue, out retryCount) && retryCount > 0) {
+                        retryCount--;
+                        var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry*", retryCount.ToString()));
+                        return Enumerable.Repeat(newUrl.ToString(), 1)
+                            .Concat(currentLines)
+                            .ToArray();
+                    }
+
                     return Enumerable.Repeat(string.Format(";{0}", workingUrl.ToString()), 1)
                         .Concat(currentLines)
                         .ToArray();

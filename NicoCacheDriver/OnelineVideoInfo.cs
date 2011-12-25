@@ -85,5 +85,63 @@ namespace Hazychill.NicoCacheDriver {
                 return Regex.IsMatch(line, PATTERN);
             }
         }
+
+        // ^(?:;<(?<name>[^;>]+)>(?<value>[^;]+))*(?:;(?<tail>.*))?$
+        private static string pattern = "^(?:;<(?<name>[^;>]+)>(?<value>[^;]+))*(?:;(?<tail>.*))?$";
+
+        public OnelineVideoInfo SetParameters(params Tuple<string, string>[] parameters) {
+            Dictionary<string,string> paramMap;
+            string tail;
+            ExtractParameters(out paramMap, out tail);
+
+            foreach (var item in parameters.Reverse()) {
+                var name = item.Item1.ToLower();
+                var value = item.Item2;
+                paramMap[name] = value;
+            }
+
+            var newParamsSec = paramMap.Keys.Select(x => string.Format(";<{0}>{1}", x, paramMap[x]));
+            var newParams = string.Join(string.Empty, newParamsSec);
+
+            string beforeComment = Regex.Match(line, PATTERN).Groups["beforeComment"].Value;
+            string newLine;
+            if (tail == null) {
+                newLine = string.Format("{0}{1}", beforeComment, newParams);
+            }
+            else {
+                newLine = string.Format("{0}{1};{2}", beforeComment, newParams, tail);
+            }
+
+            return OnelineVideoInfo.FromString(newLine);
+        }
+
+        private void ExtractParameters(out Dictionary<string, string> paramMap, out string tail) {
+            var comment = string.Format(";{0}", this.Comment);
+            var m = Regex.Match(comment, pattern);
+            var paramsCount = m.Groups["name"].Captures.Count;
+
+            paramMap = new Dictionary<string, string>();
+            for (var i = 0; i < paramsCount; i++) {
+                var name = m.Groups["name"].Captures[i].Value.ToLower();
+                var value = m.Groups["value"].Captures[i].Value;
+                if (!paramMap.ContainsKey(name)) {
+                    paramMap.Add(name, value);
+                }
+            }
+            tail = m.Groups["tail"].Value;
+        }
+
+        public string GetParameter(string name) {
+            Dictionary<string,string> paramMap;
+            string tail;
+            ExtractParameters(out paramMap, out tail);
+            string value;
+            if (paramMap.TryGetValue(name.ToLower(), out value)) {
+                return value;
+            }
+            else {
+                return null;
+            }
+        }
     }
 }
