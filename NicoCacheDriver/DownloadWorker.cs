@@ -9,6 +9,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Hazychill.NicoCacheDriver {
     class DownloadWorker : Component {
@@ -16,6 +17,7 @@ namespace Hazychill.NicoCacheDriver {
         private IWebProxy proxy;
         private AsyncOperation asyncOp;
         private object asyncOpLock = new object();
+        private TaskFactory taskFactory;
 
         public event DownloadProgressChangedEventHandler DownloadProgressChanged;
         public event AsyncCompletedEventHandler DownloadCompleted;
@@ -27,6 +29,7 @@ namespace Hazychill.NicoCacheDriver {
 
         public DownloadWorker() {
             IsBusy = false;
+            taskFactory = new TaskFactory();
         }
 
         public void Setup(string userSession, string proxyHost, int proxyPort, NicoAccessTimer timer) {
@@ -257,10 +260,8 @@ namespace Hazychill.NicoCacheDriver {
             CancellationPending = false;
             IsBusy = true;
 
-            ParameterizedThreadStart start = DownloadThreadStart;
-            Thread thread = new Thread(start);
-            thread.Start(asyncOp);
-
+            // Is Task.Dispose() required?
+            taskFactory.StartNew(DownloadThreadStart, asyncOp);
         }
 
         private void DownloadThreadStart(object obj) {
