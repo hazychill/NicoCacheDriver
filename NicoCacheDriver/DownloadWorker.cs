@@ -241,7 +241,7 @@ namespace Hazychill.NicoCacheDriver {
 
         private void CheckCancelled() {
             if (CancellationPending) {
-                throw new CancelException();
+                throw new OperationCanceledException();
             }
         }
 
@@ -280,7 +280,7 @@ namespace Hazychill.NicoCacheDriver {
                     error = incompleteDownloadException;
                 }
             }
-            catch (CancelException) {
+            catch (OperationCanceledException) {
                 cancelled = true;
             }
             catch (Exception e) {

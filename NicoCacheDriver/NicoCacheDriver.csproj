@@ -82,7 +82,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CancelException.cs" />
     <Compile Include="DownloadProgressChangedEventArgs.cs" />
     <Compile Include="DownloadProgressChangedEventHandler.cs" />
     <Compile Include="DownloadWorker.cs">
