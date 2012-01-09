@@ -80,15 +80,19 @@ namespace Hazychill.NicoCacheDriver {
                 }
                 Wait(waitMilliseconds);
             }
-            HttpWebRequest request = WebRequest.Create(WatchUrl) as HttpWebRequest;
-            request.CookieContainer = cookies;
-            request.Proxy = proxy;
             string responseText;
-            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-            using (Stream responseStream = response.GetResponseStream())
-            using (TextReader reader = new StreamReader(responseStream, utf8)) {
+            HttpWebRequest request = WebRequest.Create(WatchUrl) as HttpWebRequest;
+            try {
+                request.CookieContainer = cookies;
+                request.Proxy = proxy;
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                using (Stream responseStream = response.GetResponseStream())
+                using (TextReader reader = new StreamReader(responseStream, utf8)) {
+                    responseText = reader.ReadToEnd();
+                }
+            }
+            finally {
                 Timer.UpdateLastAccess(WatchUrl);
-                responseText = reader.ReadToEnd();
             }
 
             // ^\s*title:\s*'(?<title>[^']*)'
@@ -122,14 +126,18 @@ namespace Hazychill.NicoCacheDriver {
                 }
                 Wait(waitMilliseconds);
             }
-            request = WebRequest.Create(getflvUrl) as HttpWebRequest;
-            request.CookieContainer = cookies;
-            request.Proxy = proxy;
-            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
-            using (Stream responseStream = response.GetResponseStream())
-            using (TextReader reader = new StreamReader(responseStream, utf8)) {
+            try {
+                request = WebRequest.Create(getflvUrl) as HttpWebRequest;
+                request.CookieContainer = cookies;
+                request.Proxy = proxy;
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                using (Stream responseStream = response.GetResponseStream())
+                using (TextReader reader = new StreamReader(responseStream, utf8)) {
+                    responseText = reader.ReadToEnd();
+                }
+            }
+            finally {
                 Timer.UpdateLastAccess(getflvUrl);
-                responseText = reader.ReadToEnd();
             }
 
             CheckCancelled();
@@ -148,9 +156,16 @@ namespace Hazychill.NicoCacheDriver {
             request = WebRequest.Create(url) as HttpWebRequest;
             request.CookieContainer = cookies;
             request.Proxy = proxy;
-            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse) {
-                Timer.UpdateLastAccess(url);
-                long contentLength = response.ContentLength;
+
+            HttpWebResponse videoResponse = null;
+            try {
+                try {
+                    videoResponse = request.GetResponse() as HttpWebResponse;
+                }
+                finally {
+                    Timer.UpdateLastAccess(url);
+                }
+                long contentLength = videoResponse.ContentLength;
                 int previousPercentage = -1;
                 int percentage = 0;
                 long read = 0;
@@ -165,7 +180,7 @@ namespace Hazychill.NicoCacheDriver {
 
                 CheckCancelled();
 
-                using (Stream responseStream = response.GetResponseStream()) {
+                using (Stream responseStream = videoResponse.GetResponseStream()) {
                     int count;
                     byte[] buffer = new byte[4096];
                     while ((count = responseStream.Read(buffer, 0, buffer.Length)) > 0) {
@@ -200,6 +215,11 @@ namespace Hazychill.NicoCacheDriver {
                             asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                         }
                     }
+                }
+            }
+            finally {
+                if (videoResponse != null) {
+                    (videoResponse as IDisposable).Dispose();
                 }
             }
 
