@@ -14,6 +14,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Diagnostics.Contracts;
+using NicoCacheDriver;
 
 namespace Hazychill.NicoCacheDriver {
     public partial class NicoCacheDriverForm : Form {
@@ -192,26 +193,45 @@ namespace Hazychill.NicoCacheDriver {
             }
             if (e.Error != null) {
                 WithEditQueueingUrls(currentLines => {
-                    var retryValue = workingUrl.GetParameter("retry");
+                    var immediateRetryValue = workingUrl.GetParameter("retry");
+                    var queuedRetryValue = workingUrl.GetParameter("retry*");
+                    RetryType defaultRetryType;
+                    int defaultRetryCount;
+                    GetDefaultRetrySetting(smng, out defaultRetryType, out defaultRetryCount);
+
+                    RetryType retryType;
                     int retryCount;
-                    if (int.TryParse(retryValue, out retryCount) && retryCount > 0) {
+
+                    if (int.TryParse(immediateRetryValue, out retryCount)) {
+                        retryType = RetryType.Immediate;
+                        retryCount = Math.Max(0, retryCount);
+                    }
+                    else if (int.TryParse(queuedRetryValue, out retryCount)) {
+                        retryType = RetryType.Queued;
+                        retryCount = Math.Max(0, retryCount);
+                    }
+                    else {
+                        retryType = defaultRetryType;
+                        retryCount = Math.Max(0, defaultRetryCount);
+                    }
+
+                    if (retryType == RetryType.Immediate && retryCount >= 1) {
                         retryCount--;
                         var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry", retryCount.ToString()));
                         return currentLines
-                            .Concat(Enumerable.Repeat(newUrl.ToString(), 1))
+                            .Concat(new string[] {newUrl.ToString()})
                             .ToArray();
                     }
 
-                    retryValue = workingUrl.GetParameter("retry*");
-                    if (int.TryParse(retryValue, out retryCount) && retryCount > 0) {
+                    if (retryType == RetryType.Queued && retryCount >= 1) {
                         retryCount--;
                         var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry*", retryCount.ToString()));
-                        return Enumerable.Repeat(newUrl.ToString(), 1)
+                        return new string[] {newUrl.ToString()}
                             .Concat(currentLines)
                             .ToArray();
                     }
-
-                    return Enumerable.Repeat(string.Format(";{0}", workingUrl.ToString()), 1)
+                    
+                    return new string[] {string.Format(";{0}", workingUrl.ToString())}
                         .Concat(currentLines)
                         .ToArray();
                 });
@@ -484,6 +504,15 @@ namespace Hazychill.NicoCacheDriver {
                 }
             }
             return userSession;
+        }
+
+        private void GetDefaultRetrySetting(SettingsManager smng, out RetryType defaultRetryType, out int defaultRetryCount) {
+            if (!smng.TryGetItem(SettingsConstants.DEFAULT_RETRY_TYPE, out defaultRetryType)) {
+                defaultRetryType = RetryType.None;
+            }
+            if (!smng.TryGetItem(SettingsConstants.DEFAULT_RETRY_COUNT, out defaultRetryCount)) {
+                defaultRetryCount = 0;
+            }
         }
 
         private void StartDownload() {

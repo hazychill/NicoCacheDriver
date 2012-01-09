@@ -19,5 +19,7 @@ namespace Hazychill.NicoCacheDriver {
         public const string PROXY_HOST = "proxyHost";
         public const string PROXY_PORT = "proxyPort";
         public const string LOG_FILE = "logFile";
+        public const string DEFAULT_RETRY_TYPE = "defaultRetryType";
+        public const string DEFAULT_RETRY_COUNT = "defaultRetryCount";
     }
 }
