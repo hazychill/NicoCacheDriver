@@ -11,7 +11,8 @@ namespace Hazychill.NicoCacheDriver {
         Dictionary<string, NicoWaitInfo> waitInfoMap;
         Dictionary<string, List<Regex>> patternMap;
 
-        public NicoAccessTimer(ISettingsManager smng) : this(smng, null) {
+        public NicoAccessTimer(ISettingsManager smng)
+            : this(smng, null) {
         }
 
         private NicoAccessTimer(ISettingsManager smng, Dictionary<string, NicoWaitInfo> baseWaitInfoMap) {

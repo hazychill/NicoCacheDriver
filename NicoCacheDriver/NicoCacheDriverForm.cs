@@ -54,7 +54,7 @@ namespace Hazychill.NicoCacheDriver {
             var taskFactory = new TaskFactory();
 
             var loadSettingsTask = taskFactory.StartNew(LoadSettings);
-            
+
             var applySettingsTask = loadSettingsTask.ContinueWith(_ => {
                 if (settingsLoaded) {
                     SetAllControlEnabledStatus(true);
@@ -222,19 +222,19 @@ namespace Hazychill.NicoCacheDriver {
                         retryCount--;
                         var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry", retryCount.ToString()));
                         return currentLines
-                            .Concat(new string[] {newUrl.ToString()})
+                            .Concat(new string[] { newUrl.ToString() })
                             .ToArray();
                     }
 
                     if (retryType == RetryType.Queued && retryCount >= 1) {
                         retryCount--;
                         var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry*", retryCount.ToString()));
-                        return new string[] {newUrl.ToString()}
+                        return new string[] { newUrl.ToString() }
                             .Concat(currentLines)
                             .ToArray();
                     }
-                    
-                    return new string[] {string.Format(";{0}", workingUrl.ToString())}
+
+                    return new string[] { string.Format(";{0}", workingUrl.ToString()) }
                         .Concat(currentLines)
                         .ToArray();
                 });

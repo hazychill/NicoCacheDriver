@@ -9,7 +9,8 @@ namespace Hazychill.NicoCacheDriver {
         public DateTime LastAccess { get; private set; }
         public TimeSpan Interval { get; private set; }
 
-        public NicoWaitInfo(TimeSpan interval) : this(interval, DateTime.MinValue) {
+        public NicoWaitInfo(TimeSpan interval)
+            : this(interval, DateTime.MinValue) {
         }
 
         public NicoWaitInfo(TimeSpan interval, DateTime lastAccess) {

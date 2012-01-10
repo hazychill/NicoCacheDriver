@@ -12,7 +12,7 @@ namespace Hazychill.NicoCacheDriver {
         public NicoCacheDriverChangedProgressType Type { get; set; }
     }
 
-    enum NicoCacheDriverChangedProgressType { 
+    enum NicoCacheDriverChangedProgressType {
         None = 0,
         MiddleOfDownload,
         FileCompleted,
