@@ -18,6 +18,8 @@ namespace Hazychill.NicoCacheDriver {
         private AsyncOperation asyncOp;
         private object asyncOpLock = new object();
         private TaskFactory taskFactory;
+        private CancellationTokenSource cancellationTokenSource;
+        private CancellationToken cancellationToken;
 
         public event DownloadProgressChangedEventHandler DownloadProgressChanged;
         public event AsyncCompletedEventHandler DownloadCompleted;
@@ -25,11 +27,22 @@ namespace Hazychill.NicoCacheDriver {
         public string WatchUrl { get; set; }
         public NicoAccessTimer Timer { get; set; }
         public bool IsBusy { get; private set; }
-        public bool CancellationPending { get; private set; }
+
+        public bool CancellationPending {
+            get {
+                if (cancellationTokenSource != null) {
+                    return cancellationToken.IsCancellationRequested;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
 
         public DownloadWorker() {
             IsBusy = false;
             taskFactory = new TaskFactory();
+            cancellationToken = CancellationToken.None;
         }
 
         public void Setup(string userSession, string proxyHost, int proxyPort, NicoAccessTimer timer) {
@@ -240,13 +253,16 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void CheckCancelled() {
-            if (CancellationPending) {
-                throw new OperationCanceledException();
+            if (cancellationTokenSource != null) {
+                cancellationToken.ThrowIfCancellationRequested();
             }
         }
 
         public void CancelAsync() {
-            CancellationPending = true;
+            if (cancellationTokenSource == null) {
+                throw new InvalidOperationException("Async operation is not in progress.");
+            }
+            cancellationTokenSource.Cancel();
         }
 
         public void DownloadAsync(object userState) {
@@ -257,7 +273,10 @@ namespace Hazychill.NicoCacheDriver {
                 asyncOp = AsyncOperationManager.CreateOperation(userState);
             }
 
-            CancellationPending = false;
+            Contract.Requires(cancellationTokenSource == null);
+
+            cancellationTokenSource = new CancellationTokenSource();
+            cancellationToken = cancellationTokenSource.Token;
             IsBusy = true;
 
             // Is Task.Dispose() required?
@@ -267,6 +286,8 @@ namespace Hazychill.NicoCacheDriver {
         private void DownloadThreadStart(object obj) {
             Contract.Requires(obj != null);
             Contract.Requires(obj is AsyncOperation);
+            Contract.Requires(cancellationTokenSource != null);
+            Contract.Requires(cancellationToken.IsCancellationRequested == false);
 
             AsyncOperation asyncOp = obj as AsyncOperation;
 
@@ -291,6 +312,9 @@ namespace Hazychill.NicoCacheDriver {
                 asyncOp.PostOperationCompleted(OnDownloadCompleted, asyncCompletedEventArgs);
                 this.asyncOp = null;
                 IsBusy = false;
+                cancellationTokenSource.Dispose();
+                cancellationTokenSource = null;
+                cancellationToken = CancellationToken.None;
             }
         }
 
