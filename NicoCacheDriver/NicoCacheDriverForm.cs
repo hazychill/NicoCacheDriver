@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Diagnostics.Contracts;
 using NicoCacheDriver;
+using System.Threading.Tasks;
 
 namespace Hazychill.NicoCacheDriver {
     public partial class NicoCacheDriverForm : Form {
@@ -30,6 +31,8 @@ namespace Hazychill.NicoCacheDriver {
         Size lastSize;
         TextWriter logWriter;
 
+        SynchronizationContext uiContext;
+
         public NicoCacheDriverForm(string settingsFilePath) {
             InitializeComponent();
             settingsLoaded = false;
@@ -38,6 +41,7 @@ namespace Hazychill.NicoCacheDriver {
             lastWindowState = this.WindowState;
             lastSize = this.Size;
             logWriter = TextWriter.Null;
+            uiContext = SynchronizationContext.Current;
         }
 
         #region Event handlers
@@ -46,64 +50,63 @@ namespace Hazychill.NicoCacheDriver {
             SetAllControlEnabledStatus(false);
             Text = "NicoCacheDriver (Loading settings...)";
             OutputMessage(string.Format("Using : {0}", GetSettingsFilePath()));
-            Action action = LoadSettings;
-            action.BeginInvoke(delegate(IAsyncResult result) {
-                Action action2 = delegate {
-                    if (settingsLoaded) {
-                        SetAllControlEnabledStatus(true);
-                        interceptButton.Enabled = false;
-                        cancelDLButton.Enabled = false;
-                        Text = "NicoCacheDriver";
-                    }
-                    else {
-                        Text = "NicoCacheDriver (Loading settings failed!)";
-                        splitContainer1.Enabled = true;
-                        splitContainer1.Panel2.Enabled = true;
-                        exitButton.Enabled = true;
-                    }
-                    bool timeEnabled;
-                    if (!smng.TryGetItem(SettingsConstants.TIME_ENABLED, out timeEnabled)) {
-                        timeEnabled = false;
-                    }
-                    downloadableTimeEnabled.Checked = timeEnabled;
-                    DateTime start;
-                    if (smng.TryGetItem(SettingsConstants.START, out start)) {
-                        downloadableTimeStart.Value = start;
-                    }
-                    DateTime end;
-                    if (smng.TryGetItem(SettingsConstants.END, out end)) {
-                        downloadableTimeEnd.Value = end;
-                    }
 
-                    string logFile;
-                    if (smng.TryGetItem(SettingsConstants.LOG_FILE, out logFile)) {
-                        logWriter.Dispose();
-                        Stream logStream = File.Open(logFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
-                        logWriter = new StreamWriter(logStream, new UTF8Encoding());
-                    }
-                };
-                this.Invoke(action2);
+            var taskFactory = new TaskFactory();
+
+            var loadSettingsTask = taskFactory.StartNew(LoadSettings);
+            
+            var applySettingsTask = loadSettingsTask.ContinueWith(_ => {
+                if (settingsLoaded) {
+                    SetAllControlEnabledStatus(true);
+                    interceptButton.Enabled = false;
+                    cancelDLButton.Enabled = false;
+                    Text = "NicoCacheDriver";
+                }
+                else {
+                    Text = "NicoCacheDriver (Loading settings failed!)";
+                    splitContainer1.Enabled = true;
+                    splitContainer1.Panel2.Enabled = true;
+                    exitButton.Enabled = true;
+                }
+
+                bool timeEnabled;
+                if (!smng.TryGetItem(SettingsConstants.TIME_ENABLED, out timeEnabled)) {
+                    timeEnabled = false;
+                }
+                downloadableTimeEnabled.Checked = timeEnabled;
+
+                DateTime start;
+                if (smng.TryGetItem(SettingsConstants.START, out start)) {
+                    downloadableTimeStart.Value = start;
+                }
+                DateTime end;
+                if (smng.TryGetItem(SettingsConstants.END, out end)) {
+                    downloadableTimeEnd.Value = end;
+                }
+
+                string logFile;
+                if (smng.TryGetItem(SettingsConstants.LOG_FILE, out logFile)) {
+                    logWriter.Dispose();
+                    Stream logStream = File.Open(logFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+                    logWriter = new StreamWriter(logStream, new UTF8Encoding());
+                }
+
                 bool autoStart;
                 if (!smng.TryGetItem<bool>(SettingsConstants.AUTO_START, out autoStart)) {
                     autoStart = false;
                 }
-                Action startTimer = delegate {
-                    if (autoStart) {
-                        pollingTimer.Start();
-                        onlineController.Checked = true;
-                        onlineController.Text = "Online";
-                    }
-                    else {
-                        onlineController.Checked = false;
-                        onlineController.Text = "Offline";
-                    }
+                if (autoStart) {
+                    pollingTimer.Start();
+                    onlineController.Checked = true;
+                    onlineController.Text = "Online";
+                }
+                else {
+                    onlineController.Checked = false;
+                    onlineController.Text = "Offline";
+                }
 
-                    queueingUrls.Focus();
-                };
-                this.Invoke(startTimer);
-
-                action.EndInvoke(result);
-            }, null);
+                queueingUrls.Focus();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
@@ -334,75 +337,81 @@ namespace Hazychill.NicoCacheDriver {
                 pollingTimer.Stop();
             }
             Dictionary<Control, bool> enabledStateMap = SetAllControlEnabledStatus(false);
-            Action loadSettingsAction = delegate {
+
+            OutputMessage("");
+            OutputMessage(string.Format("Using : {0}", GetSettingsFilePath()));
+
+            var taskFactory = new TaskFactory();
+
+            var loadSettingsTask = taskFactory.StartNew(() => {
                 SettingsManager newSmng = new SettingsManager();
                 newSmng.ConverterMap.Add(typeof(Regex),
                                       new FlexibleConverter<Regex>(regex => regex.ToString(),
                                                                    str => new Regex(str)));
+                settingsLoaded = false;
+                string settingsFilePath = GetSettingsFilePath();
+                newSmng.Load(settingsFilePath);
+
+                string getnicovideousersessionfromchromium = newSmng.GetItem<string>(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM);
+                smng.SetOrAddNewItem(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM, getnicovideousersessionfromchromium);
+
+                foreach (SettingsItem<string> timerNameItem in smng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
+                    string timerName = timerNameItem.Value;
+                    string timerIntervalName = string.Format("{0}_{1}", SettingsConstants.TIMER_INTERVAL_PREFIX, timerName);
+                    smng.RemoveAll<TimeSpan>(timerIntervalName);
+                    string timerPatternName = string.Format("{0}_{1}", SettingsConstants.TIMER_PATTERN_PREFIX, timerName);
+                    smng.RemoveAll<Regex>(timerPatternName);
+                }
+                smng.RemoveAll<string>(SettingsConstants.TIMER_NAME);
+
+                foreach (string timerName in newSmng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
+                    smng.AddItem(SettingsConstants.TIMER_NAME, timerName);
+                    string timerIntervalName = string.Format("{0}_{1}", SettingsConstants.TIMER_INTERVAL_PREFIX, timerName);
+                    TimeSpan timerInterval = newSmng.GetItem<TimeSpan>(timerIntervalName);
+                    smng.AddItem(timerIntervalName, timerInterval);
+                    string timerPatternName = string.Format("{0}_{1}", SettingsConstants.TIMER_PATTERN_PREFIX, timerName);
+                    Regex timerPattern = newSmng.GetItem<Regex>(timerPatternName);
+                    smng.AddItem(timerPatternName, timerPattern);
+                }
+
+                string userSession = GetUserSession(smng);
+                downloadWorker.SetUserSession(userSession);
+
+                NicoAccessTimer timer = downloadWorker.Timer;
+                NicoAccessTimer newTimer = timer.DeriveNewTimer(smng);
+                downloadWorker.Timer = newTimer;
+
+                return userSession;
+            });
+
+            var applySettingsTask = loadSettingsTask.ContinueWith(precedentTask => {
                 try {
-                    settingsLoaded = false;
-                    string settingsFilePath = GetSettingsFilePath();
-                    newSmng.Load(settingsFilePath);
+                    // only for exception propagation
+                    precedentTask.Wait();
 
-                    string getnicovideousersessionfromchromium = newSmng.GetItem<string>(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM);
-                    smng.SetOrAddNewItem(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM, getnicovideousersessionfromchromium);
-
-                    foreach (SettingsItem<string> timerNameItem in smng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
-                        string timerName = timerNameItem.Value;
-                        string timerIntervalName = string.Format("{0}_{1}", SettingsConstants.TIMER_INTERVAL_PREFIX, timerName);
-                        smng.RemoveAll<TimeSpan>(timerIntervalName);
-                        string timerPatternName = string.Format("{0}_{1}", SettingsConstants.TIMER_PATTERN_PREFIX, timerName);
-                        smng.RemoveAll<Regex>(timerPatternName);
+                    var userSession = precedentTask.Result;
+                    OutputMessage(string.Format("User session: {0}", userSession));
+                    RestoreAllControlEnabledStatus(enabledStateMap);
+                    if (isOnline) {
+                        pollingTimer.Start();
                     }
-                    smng.RemoveAll<string>(SettingsConstants.TIMER_NAME);
-
-                    foreach (string timerName in newSmng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
-                        smng.AddItem(SettingsConstants.TIMER_NAME, timerName);
-                        string timerIntervalName = string.Format("{0}_{1}", SettingsConstants.TIMER_INTERVAL_PREFIX, timerName);
-                        TimeSpan timerInterval = newSmng.GetItem<TimeSpan>(timerIntervalName);
-                        smng.AddItem(timerIntervalName, timerInterval);
-                        string timerPatternName = string.Format("{0}_{1}", SettingsConstants.TIMER_PATTERN_PREFIX, timerName);
-                        Regex timerPattern = newSmng.GetItem<Regex>(timerPatternName);
-                        smng.AddItem(timerPatternName, timerPattern);
-                    }
-
-                    string userSession = GetUserSession(smng);
-                    downloadWorker.SetUserSession(userSession);
-
-                    NicoAccessTimer timer = downloadWorker.Timer;
-                    NicoAccessTimer newTimer = timer.DeriveNewTimer(smng);
-                    downloadWorker.Timer = newTimer;
-
-                    Action uiAction = delegate {
-                        OutputMessage(string.Format("User session: {0}", userSession));
-                        RestoreAllControlEnabledStatus(enabledStateMap);
-                        if (isOnline) {
-                            pollingTimer.Start();
-                        }
-                    };
-                    this.Invoke(uiAction);
                     settingsLoaded = true;
                 }
-                catch (Exception exception) {
-                    Action uiAction = delegate {
-                        onlineController.Text = "Offline";
-                        onlineController.Checked = false;
-                        statusIndicator.BackColor = Color.Gray;
-                        splitContainer1.Enabled = true;
-                        splitContainer1.Panel2.Enabled = true;
-                        exitButton.Enabled = true;
-                        outputTextBox.Enabled = true;
-                        MessageBox.Show(exception.ToString());
-                    };
-                    this.Invoke(uiAction);
+                catch (AggregateException exception) {
+                    Exception exp = exception;
+                    if (exception.InnerExceptions.Count == 1) {
+                        exp = exception.InnerExceptions[0];
+                    }
+                    onlineController.Text = "Offline";
+                    onlineController.Checked = false;
+                    statusIndicator.BackColor = Color.Gray;
+                    splitContainer1.Enabled = true;
+                    splitContainer1.Panel2.Enabled = true;
+                    exitButton.Enabled = true;
+                    outputTextBox.Enabled = true;
+                    MessageBox.Show(exp.ToString());
                 }
-            };
-
-            OutputMessage("");
-            OutputMessage(string.Format("Using : {0}", GetSettingsFilePath()));
-            loadSettingsAction.BeginInvoke(new AsyncCallback(delegate(IAsyncResult ar) {
-                loadSettingsAction.EndInvoke(ar);
-            }), null);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void queueingUrls_UpdateTimerEvent(object sender, EventArgs e) {
@@ -427,7 +436,7 @@ namespace Hazychill.NicoCacheDriver {
                                                                    str => new Regex(str)));
                 smng.Load(settingsFilePath);
 
-                this.Invoke(new Action(delegate {
+                uiContext.Send(_ => {
                     Size size;
                     if (smng.TryGetItem(SettingsConstants.SIZE, out size)) {
                         this.Size = size;
@@ -437,7 +446,7 @@ namespace Hazychill.NicoCacheDriver {
                     if (smng.TryGetItem(SettingsConstants.WINDOW_STATE, out windowState)) {
                         this.WindowState = windowState;
                     }
-                }));
+                }, null);
 
                 NicoAccessTimer timer = new NicoAccessTimer(smng);
 
@@ -455,16 +464,14 @@ namespace Hazychill.NicoCacheDriver {
 
                 downloadWorker.Setup(userSession, proxyHost, proxyPort, timer);
 
-                Action action = delegate() {
+                uiContext.Send(_ => {
                     WithEditQueueingUrls(delegate(string[] currentLines) {
                         return smng.GetItems<string>(SettingsConstants.URL)
                             .Select(x => x.Value)
                             .ToArray();
                     });
                     OutputMessage(string.Format("User session: {0}", userSession));
-
-                };
-                this.Invoke(action);
+                }, null);
 
                 settingsLoaded = true;
             }
@@ -489,6 +496,11 @@ namespace Hazychill.NicoCacheDriver {
         private string GetUserSession(SettingsManager smng) {
             string userSession;
             string getnicovideousersessionfromchromium = smng.GetItem<string>(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM);
+
+            if (!File.Exists(getnicovideousersessionfromchromium)) {
+                throw new FileNotFoundException(string.Format("Not found \"{0}\"", getnicovideousersessionfromchromium));
+            }
+
             ProcessStartInfo startInfo = new ProcessStartInfo(getnicovideousersessionfromchromium);
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardOutput = true;
