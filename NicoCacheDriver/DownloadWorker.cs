@@ -280,10 +280,10 @@ namespace Hazychill.NicoCacheDriver {
             IsBusy = true;
 
             // Is Task.Dispose() required?
-            taskFactory.StartNew(DownloadThreadStart, asyncOp);
+            taskFactory.StartNew(DownloadTaskStart, asyncOp);
         }
 
-        private void DownloadThreadStart(object obj) {
+        private void DownloadTaskStart(object obj) {
             Contract.Requires(obj != null);
             Contract.Requires(obj is AsyncOperation);
             Contract.Requires(cancellationTokenSource != null);
