@@ -41,7 +41,7 @@ namespace Hazychill.NicoCacheDriver {
 
         public DownloadWorker() {
             IsBusy = false;
-            taskFactory = new TaskFactory();
+            taskFactory = new TaskFactory(TaskCreationOptions.LongRunning, TaskContinuationOptions.None);
             cancellationToken = CancellationToken.None;
         }
 
