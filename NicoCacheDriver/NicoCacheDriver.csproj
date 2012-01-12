@@ -87,6 +87,7 @@
     <Compile Include="DownloadWorker.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="MyListExtractor.cs" />
     <Compile Include="NicoCacheDriverForm.cs">
       <SubType>Form</SubType>
     </Compile>

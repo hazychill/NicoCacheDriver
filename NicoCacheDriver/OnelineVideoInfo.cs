@@ -8,7 +8,10 @@ using System.Diagnostics.Contracts;
 namespace Hazychill.NicoCacheDriver {
     struct OnelineVideoInfo {
         // ^(?<beforeComment>\s*(?:http://www\.nicovideo\.jp/watch/)?(?<id>(?:[a-z][a-z])?\d+)\s*)(?:;(?<comment>.+))?$
-        const string PATTERN = "^(?<beforeComment>\\s*(?:http://www\\.nicovideo\\.jp/watch/)?(?<id>(?:[a-z][a-z])?\\d+)\\s*)(?:;(?<comment>.+))?$";
+        const string WATCH_PATTERN = "^(?<beforeComment>\\s*(?:http://www\\.nicovideo\\.jp/watch/)?(?<id>(?:[a-z][a-z])?\\d+)\\s*)(?:;(?<comment>.+))?$";
+
+        // ^http://www.nicovideo.jp/mylist/\d+$
+        const string MYLIST_PATTERN = "^http://www.nicovideo.jp/mylist/\\d+$";
         string line;
 
         private OnelineVideoInfo(string line) {
@@ -32,10 +35,10 @@ namespace Hazychill.NicoCacheDriver {
             if (comment == null) {
                 throw new ArgumentNullException("comment");
             }
-            if (!IsValid) {
+            if (!IsWatchUrl) {
                 throw new InvalidOperationException("line is invalid");
             }
-            string beforeComment = Regex.Match(line, PATTERN).Groups["beforeComment"].Value;
+            string beforeComment = Regex.Match(line, WATCH_PATTERN).Groups["beforeComment"].Value;
             string newLine = string.Format("{0};{1}", beforeComment, comment);
             return FromString(newLine);
         }
@@ -50,7 +53,7 @@ namespace Hazychill.NicoCacheDriver {
         public string Id {
             get {
                 Contract.Requires(line != null);
-                Match m = Regex.Match(line, PATTERN);
+                Match m = Regex.Match(line, WATCH_PATTERN);
                 string id;
                 if (m.Success) {
                     id = m.Groups["id"].Value;
@@ -66,7 +69,7 @@ namespace Hazychill.NicoCacheDriver {
         public string Comment {
             get {
                 Contract.Requires(line != null);
-                Match m = Regex.Match(line, PATTERN);
+                Match m = Regex.Match(line, WATCH_PATTERN);
                 string comment;
                 if (m.Groups["comment"].Success) {
                     comment = m.Groups["comment"].Value;
@@ -79,10 +82,17 @@ namespace Hazychill.NicoCacheDriver {
             }
         }
 
-        public bool IsValid {
+        public bool IsWatchUrl {
             get {
                 Contract.Requires(line != null);
-                return Regex.IsMatch(line, PATTERN);
+                return Regex.IsMatch(line, WATCH_PATTERN);
+            }
+        }
+
+        public bool IsMylistUrl {
+            get {
+                Contract.Requires(line != null);
+                return Regex.IsMatch(line, MYLIST_PATTERN);
             }
         }
 
@@ -103,7 +113,7 @@ namespace Hazychill.NicoCacheDriver {
             var newParamsSec = paramMap.Keys.Select(x => string.Format(";<{0}>{1}", x, paramMap[x]));
             var newParams = string.Join(string.Empty, newParamsSec);
 
-            string beforeComment = Regex.Match(line, PATTERN).Groups["beforeComment"].Value;
+            string beforeComment = Regex.Match(line, WATCH_PATTERN).Groups["beforeComment"].Value;
             string newLine;
             if (tail == null) {
                 newLine = string.Format("{0}{1}", beforeComment, newParams);
@@ -143,5 +153,6 @@ namespace Hazychill.NicoCacheDriver {
                 return null;
             }
         }
+
     }
 }

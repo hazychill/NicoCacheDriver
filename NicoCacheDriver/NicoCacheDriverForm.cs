@@ -140,7 +140,7 @@ namespace Hazychill.NicoCacheDriver {
         }
 
         private void downloadWorker1_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
-            Contract.Requires(workingUrl.IsValid);
+            Contract.Requires(workingUrl.IsWatchUrl);
 
             if (progressBar1.Maximum != e.TotalBytesToReceive) {
                 progressBar1.Maximum = (int)e.TotalBytesToReceive;
@@ -546,7 +546,7 @@ namespace Hazychill.NicoCacheDriver {
                 int index = 0;
                 foreach (var line in query) {
                     if (nextUrl == null) {
-                        if (line.IsValid) {
+                        if (line.IsWatchUrl || line.IsMylistUrl) {
                             nextUrl = line.ToString();
                         }
                         else {
@@ -565,7 +565,13 @@ namespace Hazychill.NicoCacheDriver {
             });
 
             if (nextUrl != null) {
-                workingUrl = OnelineVideoInfo.FromString(nextUrl);
+                if (OnelineVideoInfo.FromString(nextUrl).IsMylistUrl) {
+                    ExtractMylist(nextUrl);
+                    return;
+                }
+                else {
+                    workingUrl = OnelineVideoInfo.FromString(nextUrl);
+                }
             }
             else {
                 queueingUrls.ReadOnly = false;
@@ -584,6 +590,36 @@ namespace Hazychill.NicoCacheDriver {
             label1.Text = workingUrl.Id;
             progressBar1.Value = 0;
             interceptButton.Enabled = true;
+        }
+
+        private void ExtractMylist(string nextUrl) {
+            var stateMap = SetAllControlEnabledStatus(false);
+
+            var messageLine = string.Format("Extracting {0}...", nextUrl);
+
+            WithEditQueueingUrls(beforeLines => {
+                return beforeLines
+                    .Concat(new string[] { messageLine })
+                    .ToArray();
+            });
+
+            var mylistTask = new TaskFactory().StartNew(() => {
+                var extractor = new MyListExtractor();
+                var watchUrls = extractor.ExtractWatchUrls(nextUrl);
+                return watchUrls;
+            });
+
+            mylistTask.ContinueWith(task => {
+                task.Wait();
+                var result = task.Result;
+                WithEditQueueingUrls(beforeLines => {
+                    return beforeLines
+                        .TakeWhile(x => !string.Equals(messageLine, x, StringComparison.Ordinal))
+                        .Concat(result)
+                        .ToArray();
+                });
+                RestoreAllControlEnabledStatus(stateMap);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private bool IsInTime() {
