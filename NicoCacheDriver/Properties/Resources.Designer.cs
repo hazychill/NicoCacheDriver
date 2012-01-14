@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace NicoCacheDriver.Properties {
+namespace Hazychill.NicoCacheDriver.Properties {
     using System;
     
     

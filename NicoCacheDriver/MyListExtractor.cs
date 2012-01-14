@@ -6,7 +6,7 @@ using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace NicoCacheDriver {
+namespace Hazychill.NicoCacheDriver {
     class MyListExtractor {
         internal IEnumerable<string> ExtractWatchUrls(string mylistUrl) {
             try {

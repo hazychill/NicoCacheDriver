@@ -14,7 +14,6 @@ using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Diagnostics.Contracts;
-using NicoCacheDriver;
 using System.Threading.Tasks;
 
 namespace Hazychill.NicoCacheDriver {
