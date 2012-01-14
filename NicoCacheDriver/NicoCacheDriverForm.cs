@@ -222,21 +222,18 @@ namespace Hazychill.NicoCacheDriver {
                         retryCount--;
                         var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry", retryCount.ToString()));
                         return currentLines
-                            .Concat(new string[] { newUrl.ToString() })
-                            .ToArray();
+                            .Concat(new string[] { newUrl.ToString() });
                     }
 
                     if (retryType == RetryType.Queued && retryCount >= 1) {
                         retryCount--;
                         var newUrl = workingUrl.SetParameters(new Tuple<string, string>("retry*", retryCount.ToString()));
                         return new string[] { newUrl.ToString() }
-                            .Concat(currentLines)
-                            .ToArray();
+                            .Concat(currentLines);
                     }
 
                     return new string[] { string.Format(";{0}", workingUrl.ToString()) }
-                        .Concat(currentLines)
-                        .ToArray();
+                        .Concat(currentLines);
                 });
                 OutputLog(e.Error.ToString());
             }
@@ -598,8 +595,7 @@ namespace Hazychill.NicoCacheDriver {
 
             WithEditQueueingUrls(beforeLines => {
                 return beforeLines
-                    .Concat(new string[] { messageLine })
-                    .ToArray();
+                    .Concat(new string[] { messageLine });
             });
 
             var mylistTask = new TaskFactory().StartNew(() => {
@@ -614,8 +610,7 @@ namespace Hazychill.NicoCacheDriver {
                 WithEditQueueingUrls(beforeLines => {
                     return beforeLines
                         .TakeWhile(x => !string.Equals(messageLine, x, StringComparison.Ordinal))
-                        .Concat(result)
-                        .ToArray();
+                        .Concat(result);
                 });
                 RestoreAllControlEnabledStatus(stateMap);
             }, TaskScheduler.FromCurrentSynchronizationContext());
