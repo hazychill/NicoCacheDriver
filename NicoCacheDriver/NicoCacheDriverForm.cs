@@ -184,8 +184,8 @@ namespace Hazychill.NicoCacheDriver {
             }
 
             if (e.Cancelled && !interrapting) {
-                WithEditQueueingUrls(delegate(string[] currentLines) {
-                    return currentLines.Concat(Enumerable.Repeat(workingUrl.ToString(), 1)).ToArray();
+                WithEditQueueingUrls(currentLines => {
+                    return currentLines.Concat(Enumerable.Repeat(workingUrl.ToString(), 1));
                 });
                 label1.Text = string.Empty;
                 progressBar1.Value = 0;
@@ -296,14 +296,15 @@ namespace Hazychill.NicoCacheDriver {
 
             if (downloadWorker.IsBusy) {
                 string interraptedUrl = workingUrl.ToString();
-                WithEditQueueingUrls(delegate(string[] currentLines) {
-                    if (currentLines.Length >= 1) {
-                        List<string> newLines = new List<string>(currentLines);
+                WithEditQueueingUrls(currentLines => {
+                    var curLineArray = currentLines.ToArray();
+                    if (curLineArray.Length >= 1) {
+                        List<string> newLines = new List<string>(curLineArray);
                         newLines.Insert(newLines.Count-1, interraptedUrl);
-                        return newLines.ToArray();
+                        return newLines;
                     }
                     else {
-                        return currentLines;
+                        return curLineArray;
                     }
                 });
                 interrapting = true;
@@ -465,10 +466,9 @@ namespace Hazychill.NicoCacheDriver {
                 downloadWorker.Setup(userSession, proxyHost, proxyPort, timer);
 
                 uiContext.Send(_ => {
-                    WithEditQueueingUrls(delegate(string[] currentLines) {
+                    WithEditQueueingUrls(currentLines => {
                         return smng.GetItems<string>(SettingsConstants.URL)
-                            .Select(x => x.Value)
-                            .ToArray();
+                            .Select(x => x.Value);
                     });
                     OutputMessage(string.Format("User session: {0}", userSession));
                 }, null);
@@ -534,7 +534,7 @@ namespace Hazychill.NicoCacheDriver {
                 return;
             }
 
-            string[] lines = WithEditQueueingUrls(delegate(string[] currentLines) {
+            var lines = WithEditQueueingUrls(currentLines => {
                 List<OnelineVideoInfo> newLines = new List<OnelineVideoInfo>();
 
                 var query = currentLines
@@ -560,8 +560,7 @@ namespace Hazychill.NicoCacheDriver {
                 }
 
                 return newLines
-                    .Select(x => x.ToString())
-                    .ToArray();
+                    .Select(x => x.ToString());
             });
 
             if (nextUrl != null) {
@@ -634,15 +633,14 @@ namespace Hazychill.NicoCacheDriver {
             }
         }
 
-        private string[] WithEditQueueingUrls(Func<string[], string[]> editMethod) {
+        private IEnumerable<string> WithEditQueueingUrls(Func<IEnumerable<string>, IEnumerable<string>> editMethod) {
             //queueingUrls.Enabled = false;
             string textBefore = queueingUrls.Text;
-            string[] currentLines = queueingUrls.Lines
+            var currentLines = queueingUrls.Lines
                 .Reverse()
                 .SkipWhile(x => string.IsNullOrEmpty(x))
-                .Reverse()
-                .ToArray();
-            string[] newLines = editMethod(currentLines);
+                .Reverse();
+            var newLines = editMethod(currentLines);
             string textAfter = string.Format("{0}{1}", string.Join(NEWLINE, newLines), NEWLINE);
             if (textAfter == "\r\n") {
                 textAfter = string.Empty;
