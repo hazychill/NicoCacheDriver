@@ -1,4 +1,5 @@
-"getnicovideousersessionfromchromium"="C:\\path\\to\\exe\\getnicovideousersessionfromchromium.exe"
+"usersessionFactory"="C:\\path\\to\\exe\\usersessionFactory.exe"
+# "usersessionFactoryArgs"="arguments for usersessionFactor"
 "timerName"="watch"
 "timerName"="reportProgress"
 "timerName"="editUrl"

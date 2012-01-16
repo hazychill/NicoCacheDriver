@@ -349,8 +349,8 @@ namespace Hazychill.NicoCacheDriver {
                 string settingsFilePath = GetSettingsFilePath();
                 newSmng.Load(settingsFilePath);
 
-                string getnicovideousersessionfromchromium = newSmng.GetItem<string>(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM);
-                smng.SetOrAddNewItem(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM, getnicovideousersessionfromchromium);
+                string usersessionFactory = newSmng.GetItem<string>(SettingsConstants.USERSESSION_FACTORY);
+                smng.SetOrAddNewItem(SettingsConstants.USERSESSION_FACTORY, usersessionFactory);
 
                 foreach (SettingsItem<string> timerNameItem in smng.GetItems<string>(SettingsConstants.TIMER_NAME)) {
                     string timerName = timerNameItem.Value;
@@ -491,17 +491,22 @@ namespace Hazychill.NicoCacheDriver {
 
         private string GetUserSession(SettingsManager smng) {
             string userSession;
-            string getnicovideousersessionfromchromium = smng.GetItem<string>(SettingsConstants.GETNICOVIDEOUSERSESSIONFROMCHROMIUM);
+            string usersessionFactory = smng.GetItem<string>(SettingsConstants.USERSESSION_FACTORY);
 
-            if (!File.Exists(getnicovideousersessionfromchromium)) {
-                throw new FileNotFoundException(string.Format("Not found \"{0}\"", getnicovideousersessionfromchromium));
+            if (!File.Exists(usersessionFactory)) {
+                throw new FileNotFoundException(string.Format("Not found \"{0}\"", usersessionFactory));
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo(getnicovideousersessionfromchromium);
+            ProcessStartInfo startInfo = new ProcessStartInfo(usersessionFactory);
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardOutput = true;
             startInfo.UseShellExecute = false;
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+            string args;
+            if (smng.TryGetItem(SettingsConstants.USERSESSION_FACTORY_ARGS, out args)) {
+                startInfo.Arguments = args;
+            }
 
             using (Process process = new Process()) {
                 process.StartInfo = startInfo;
