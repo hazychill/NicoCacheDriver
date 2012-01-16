@@ -10,7 +10,8 @@ namespace Hazychill.NicoCacheDriver {
         public const string END = "end";
         public const string AUTO_START = "autoStart";
         public const string URL = "url";
-        public const string GETNICOVIDEOUSERSESSIONFROMCHROMIUM = "getnicovideousersessionfromchromium";
+        public const string USERSESSION_FACTORY = "usersessionFactory";
+        public const string USERSESSION_FACTORY_ARGS = "usersessionFactoryArgs";
         public const string TIMER_NAME = "timerName";
         public const string TIMER_INTERVAL_PREFIX = "timerInterval";
         public const string TIMER_PATTERN_PREFIX = "timerPattern";
