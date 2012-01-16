@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NicoCacheDriver", "NicoCach
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersessionFctoryExplicit", "UsersessionFctoryExplicit\UsersessionFctoryExplicit.csproj", "{675AAED6-FE58-47B2-9797-57D8F59546BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersessionFactoryChrome", "UsersessionFactoryChrome\UsersessionFactoryChrome.csproj", "{86C6949D-76F7-4625-B0F9-CF1EFC29BF7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -19,6 +21,10 @@ Global
 		{675AAED6-FE58-47B2-9797-57D8F59546BB}.Debug|x86.Build.0 = Debug|x86
 		{675AAED6-FE58-47B2-9797-57D8F59546BB}.Release|x86.ActiveCfg = Release|x86
 		{675AAED6-FE58-47B2-9797-57D8F59546BB}.Release|x86.Build.0 = Release|x86
+		{86C6949D-76F7-4625-B0F9-CF1EFC29BF7D}.Debug|x86.ActiveCfg = Debug|x86
+		{86C6949D-76F7-4625-B0F9-CF1EFC29BF7D}.Debug|x86.Build.0 = Debug|x86
+		{86C6949D-76F7-4625-B0F9-CF1EFC29BF7D}.Release|x86.ActiveCfg = Release|x86
+		{86C6949D-76F7-4625-B0F9-CF1EFC29BF7D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
