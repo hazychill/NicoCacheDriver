@@ -154,5 +154,13 @@ namespace Hazychill.NicoCacheDriver {
             }
         }
 
+        public string GetCommentTail() {
+            Dictionary<string, string> paramMap;
+            string tail;
+            ExtractParameters(out paramMap, out tail);
+            if (tail == null) tail = string.Empty;
+            return tail;
+        }
+
     }
 }
