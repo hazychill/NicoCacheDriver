@@ -548,7 +548,12 @@ namespace Hazychill.NicoCacheDriver {
                 foreach (var line in query) {
                     if (nextUrl == null) {
                         if (line.IsWatchUrl || line.IsMylistUrl) {
-                            nextUrl = line.ToString();
+                            if (IsInTime(line)) {
+                                nextUrl = line.ToString();
+                            }
+                            else {
+                                newLines.Insert(index, line);
+                            }
                         }
                         else {
                             index++;
@@ -628,16 +633,48 @@ namespace Hazychill.NicoCacheDriver {
             else {
                 string startTime = downloadableTimeStart.Value.ToString("HHmmss");
                 string endTime = downloadableTimeEnd.Value.ToString("HHmmss");
-                string nowTime = DateTime.Now.ToString("HHmmss");
-                if (startTime.CompareTo(endTime) < 0) {
-                    isInTime = ((startTime.CompareTo(nowTime) < 0) && (nowTime.CompareTo(endTime) < 0));
-                }
-                else {
-                    isInTime = (((startTime.CompareTo(nowTime)  < 0) && (nowTime.CompareTo("24:00:00") < 0)) || 
-                                (("00:00:00".CompareTo(nowTime) < 0) && (nowTime.CompareTo(endTime)    < 0)));
-                }
+                isInTime = IsInTime(startTime, endTime);
             }
 
+            return isInTime;
+        }
+
+        private bool IsInTime(OnelineVideoInfo line) {
+            var allowParam = line.GetParameter("allow");
+
+            if (string.IsNullOrEmpty(allowParam)) {
+                return true;
+            }
+
+            var split = allowParam.Split('-');
+            if (split.Length != 2) {
+                return true;
+            }
+
+            DateTime start;
+            DateTime end;
+            if (!DateTime.TryParse(split[0], out start)) {
+                return true;
+            }
+            if (!DateTime.TryParse(split[1], out end)) {
+                return false;
+            }
+
+            var startTime = start.ToString("HHmmss");
+            var endTime = end.ToString("HHmmss");
+            return IsInTime(startTime, endTime);
+        }
+
+        private static bool IsInTime(string startTime, string endTime) {
+            bool isInTime;
+            string nowTime = DateTime.Now.ToString("HHmmss");
+            if (startTime.CompareTo(endTime) < 0) {
+                isInTime = ((startTime.CompareTo(nowTime) < 0) && (nowTime.CompareTo(endTime) < 0));
+            }
+            else {
+                isInTime = (((startTime.CompareTo(nowTime)  < 0) && (nowTime.CompareTo("24:00:00") < 0)) || 
+                                (("00:00:00".CompareTo(nowTime) < 0) && (nowTime.CompareTo(endTime)    < 0)));
+            }
             return isInTime;
         }
 
