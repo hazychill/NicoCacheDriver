@@ -10,6 +10,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Xml;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace Hazychill.NicoCacheDriver {
     class DownloadWorker : Component {
@@ -111,28 +114,38 @@ namespace Hazychill.NicoCacheDriver {
                 Timer.UpdateLastAccess(WatchUrl);
             }
 
-            // ^\s*title:\s*'(?<title>[^']*)'
-            Match titleMatch = Regex.Match(responseText, "^\\s*title:\\s*\'(?<title>[^\']*)\'", RegexOptions.Multiline);
-            if (titleMatch.Success) {
-                string titleRaw = titleMatch.Groups["title"].Value;
-                // \\u([0-9a-f]{4})
-                title = Regex.Replace(titleRaw, "\\\\u([0-9a-f]{4})", delegate(Match m) {
-                    int utf32 = int.Parse(m.Groups[1].Value, NumberStyles.HexNumber);
-                    string c = char.ConvertFromUtf32(utf32);
-                    return c;
-                });
+            // <div id="watchAPIDataContainer" style="display:none">(?<json>\{.+?\})</div>
+            Match titleMatch = Regex.Match(responseText, "<div id=\"watchAPIDataContainer\" style=\"display:none\">(?<json>\\{.+?\\})</div>", RegexOptions.Singleline);
+            string jsonTextRaw = titleMatch.Groups["json"].Value;
+            var jsonText = string.Empty;
+            var json = null as JToken;
+            using (var jsonStrReader = new StringReader(string.Format("<json>{0}</json>", jsonTextRaw)))
+            using (var jsonXmlReader = XmlReader.Create(jsonStrReader)) {
+                while (jsonXmlReader.Read()) {
+                    if (jsonXmlReader.NodeType == XmlNodeType.Element) {
+                        jsonText = jsonXmlReader.ReadElementString();
+                        break;
+                    }
+                }
+            }
+            try {
+                json = JToken.Parse(jsonText);
+                title = json["videoDetail"].Value<string>("title");
                 if (asyncOp != null) {
                     DownloadProgressChangedEventArgs downloadProgressChangedEventArgs = new DownloadProgressChangedEventArgs(0, 0, 0, title, asyncOp.UserSuppliedState);
                     asyncOp.Post(OnDownloadProgressChanged, downloadProgressChangedEventArgs);
                 }
             }
+            catch (Exception e) {
+                Debug.WriteLine(e);
+            }
 
             CheckCancelled();
 
-            // addVideoToDeflist\((\d+),
-            string vParam = Regex.Match(responseText, "addVideoToDeflist\\((\\d+),").Groups[1].Value;
-            // id:\s*'(?<nm>nm)\d+'
-            string as3Param = (Regex.Match(responseText, "id:\\s*\'(?<nm>nm)\\d+\'").Groups["nm"].Success) ? ("&as3=1") : (string.Empty);
+            string vParam = json["videoDetail"].Value<string>("v");
+            // ^nm\d+$
+            string videoId = json["videoDetail"].Value<string>("id");
+            string as3Param = (Regex.Match(videoId, "^nm\\d+$").Success) ? ("&as3=1") : (string.Empty);
             string getflvUrl = string.Format("http://flapi.nicovideo.jp/api/getflv?v={0}{1}", vParam, as3Param);
             waitMilliseconds = Timer.GetWaitMilliSeconds(getflvUrl);
             if (waitMilliseconds > 0) {
