@@ -195,6 +195,11 @@ namespace Hazychill.NicoCacheDriver {
                     Timer.UpdateLastAccess(url);
                 }
                 long contentLength = videoResponse.ContentLength;
+
+                if (contentLength <= 0) {
+                    throw new Exception(string.Format("unexpected content length: {0}", contentLength));
+                }
+
                 int previousPercentage = -1;
                 int percentage = 0;
                 long read = 0;
