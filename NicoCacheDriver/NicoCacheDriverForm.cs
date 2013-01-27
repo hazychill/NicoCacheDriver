@@ -29,6 +29,8 @@ namespace Hazychill.NicoCacheDriver {
         FormWindowState lastWindowState;
         Size lastSize;
         TextWriter logWriter;
+        LinkedList<Tuple<DateTime, long>> etaSource;
+        DateTime downloadStartTime;
 
         SynchronizationContext uiContext;
 
@@ -40,6 +42,9 @@ namespace Hazychill.NicoCacheDriver {
             lastWindowState = this.WindowState;
             lastSize = this.Size;
             logWriter = TextWriter.Null;
+            etaSource = new LinkedList<Tuple<DateTime, long>>();
+            etaLabel.Text = string.Empty;
+            etaLabel.Visible = false;
             uiContext = SynchronizationContext.Current;
         }
 
@@ -141,6 +146,10 @@ namespace Hazychill.NicoCacheDriver {
         private void downloadWorker1_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e) {
             Contract.Requires(workingUrl.IsWatchUrl);
 
+            if (downloadStartTime == DateTime.MinValue) {
+                downloadStartTime = DateTime.Now;
+            }
+
             if (progressBar1.Maximum != e.TotalBytesToReceive) {
                 progressBar1.Maximum = (int)e.TotalBytesToReceive;
             }
@@ -157,6 +166,45 @@ namespace Hazychill.NicoCacheDriver {
             }
             if (string.IsNullOrEmpty(workingUrl.GetCommentTail()) && e.Title != null) {
                 workingUrl = OnelineVideoInfo.FromString(string.Format("{0};{1}", workingUrl.ToString(), e.Title));
+            }
+
+            var now = DateTime.Now;
+            if ((now - downloadStartTime >= TimeSpan.FromSeconds(10)) &&  (e.BytesReceived > 0)) {
+                if (etaSource.First != null) {
+                    if (now - etaSource.First.Value.Item1 >= TimeSpan.FromSeconds(1)) {
+                        LinkedListNode<Tuple<DateTime, long>> lastNode = null;
+                        var oneMinutes = TimeSpan.FromMinutes(1);
+                        foreach (var node in EnumerateLinkedListNodes(etaSource)) {
+                            lastNode = node;
+                            if (now - node.Value.Item1 >= oneMinutes) {
+                                break;
+                            }
+                        }
+                        while (etaSource.Last != lastNode) {
+                            etaSource.Remove(etaSource.Last);
+                        }
+                        var timeDiff = (now - lastNode.Value.Item1).Ticks;
+                        var bytesDiff = e.BytesReceived - lastNode.Value.Item2;
+                        var bytesRemaining = e.TotalBytesToReceive - e.BytesReceived;
+                        try {
+                            var etaTicks = timeDiff * bytesRemaining / bytesDiff;
+                            var eta = TimeSpan.FromTicks(etaTicks);
+                            var etaString = string.Format(" (-{0}:{1,2:d2})", Math.Floor(eta.TotalMinutes), eta.Seconds);
+                            etaLabel.Visible = true;
+                            etaLabel.Text = etaString;
+                        }
+                        catch (OverflowException overflowError) {
+                            Debug.WriteLine(overflowError);
+                        }
+                        etaSource.AddFirst(Tuple.Create(now, e.BytesReceived));
+                    }
+                    else {
+                        // do nothing
+                    }
+                }
+                else {
+                    etaSource.AddFirst(Tuple.Create(now, e.BytesReceived));
+                }
             }
         }
 
@@ -239,6 +287,8 @@ namespace Hazychill.NicoCacheDriver {
             label1.Text = string.Empty;
             progressBar1.Value = 0; ;
             interrapting = false;
+            etaLabel.Text = string.Empty;
+            etaLabel.Visible = false;
 
             interceptButton.Enabled = false;
             cancelDLButton.Enabled = false;
@@ -590,6 +640,8 @@ namespace Hazychill.NicoCacheDriver {
             label1.Text = workingUrl.Id;
             progressBar1.Value = 0;
             interceptButton.Enabled = true;
+            etaSource.Clear();
+            downloadStartTime = DateTime.MinValue;
         }
 
         private void ExtractMylist(string nextUrl) {
@@ -740,6 +792,15 @@ namespace Hazychill.NicoCacheDriver {
         private void OutputLog(string message) {
             logWriter.WriteLine("{0} {1}", DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff"), message);
             logWriter.Flush();
+        }
+
+        private IEnumerable<LinkedListNode<T>> EnumerateLinkedListNodes<T>(LinkedList<T> etaSource) {
+            var node = etaSource.First;
+
+            while (node != null) {
+                yield return node;
+                node = node.Next;
+            }
         }
 
         #endregion
