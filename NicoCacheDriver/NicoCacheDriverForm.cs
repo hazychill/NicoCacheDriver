@@ -173,10 +173,10 @@ namespace Hazychill.NicoCacheDriver {
                 if (etaSource.First != null) {
                     if (now - etaSource.First.Value.Item1 >= TimeSpan.FromSeconds(1)) {
                         LinkedListNode<Tuple<DateTime, long>> lastNode = null;
-                        var oneMinutes = TimeSpan.FromMinutes(1);
+                        var averageSpan = TimeSpan.FromSeconds(20);
                         foreach (var node in EnumerateLinkedListNodes(etaSource)) {
                             lastNode = node;
-                            if (now - node.Value.Item1 >= oneMinutes) {
+                            if (now - node.Value.Item1 >= averageSpan) {
                                 break;
                             }
                         }
