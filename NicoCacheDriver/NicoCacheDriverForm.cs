@@ -183,18 +183,20 @@ namespace Hazychill.NicoCacheDriver {
                         while (etaSource.Last != lastNode) {
                             etaSource.Remove(etaSource.Last);
                         }
-                        var timeDiff = (now - lastNode.Value.Item1).Ticks;
                         var bytesDiff = e.BytesReceived - lastNode.Value.Item2;
-                        var bytesRemaining = e.TotalBytesToReceive - e.BytesReceived;
-                        try {
-                            var etaTicks = timeDiff * bytesRemaining / bytesDiff;
-                            var eta = TimeSpan.FromTicks(etaTicks);
-                            var etaString = string.Format(" (-{0}:{1,2:d2})", Math.Floor(eta.TotalMinutes), eta.Seconds);
-                            etaLabel.Visible = true;
-                            etaLabel.Text = etaString;
-                        }
-                        catch (OverflowException overflowError) {
-                            Debug.WriteLine(overflowError);
+                        if (bytesDiff > 0) {
+                            var timeDiff = (now - lastNode.Value.Item1).Ticks;
+                            var bytesRemaining = e.TotalBytesToReceive - e.BytesReceived;
+                            try {
+                                var etaTicks = timeDiff * bytesRemaining / bytesDiff;
+                                var eta = TimeSpan.FromTicks(etaTicks);
+                                var etaString = string.Format(" (-{0}:{1,2:d2})", Math.Floor(eta.TotalMinutes), eta.Seconds);
+                                etaLabel.Visible = true;
+                                etaLabel.Text = etaString;
+                            }
+                            catch (OverflowException overflowError) {
+                                Debug.WriteLine(overflowError);
+                            }
                         }
                         etaSource.AddFirst(Tuple.Create(now, e.BytesReceived));
                     }
