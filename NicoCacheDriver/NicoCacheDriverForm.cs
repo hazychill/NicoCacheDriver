@@ -171,9 +171,10 @@ namespace Hazychill.NicoCacheDriver {
             var now = DateTime.Now;
             if ((now - downloadStartTime >= TimeSpan.FromSeconds(10)) &&  (e.BytesReceived > 0)) {
                 if (etaSource.First != null) {
-                    if (now - etaSource.First.Value.Item1 >= TimeSpan.FromSeconds(1)) {
+                    var etaUpdateInterval = TimeSpan.FromMilliseconds(500);
+                    if (now - etaSource.First.Value.Item1 >= etaUpdateInterval) {
                         LinkedListNode<Tuple<DateTime, long>> lastNode = null;
-                        var averageSpan = TimeSpan.FromSeconds(20);
+                        var averageSpan = TimeSpan.FromSeconds(30);
                         foreach (var node in EnumerateLinkedListNodes(etaSource)) {
                             lastNode = node;
                             if (now - node.Value.Item1 >= averageSpan) {
