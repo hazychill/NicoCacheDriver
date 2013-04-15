@@ -7,8 +7,8 @@ using System.Diagnostics.Contracts;
 
 namespace Hazychill.NicoCacheDriver {
     struct OnelineVideoInfo {
-        // ^(?<beforeComment>\s*(?:http://www\.nicovideo\.jp/watch/)?(?<id>(?:[a-z][a-z])?\d+)\s*)(?:;(?<comment>.+))?$
-        const string WATCH_PATTERN = "^(?<beforeComment>\\s*(?:http://www\\.nicovideo\\.jp/watch/)?(?<id>(?:[a-z][a-z])?\\d+)\\s*)(?:;(?<comment>.+))?$";
+        // ^(?<beforeComment>\s*(?:http://www\.nicovideo\.jp/watch/)?(?<id>(?:[a-z][a-z])?\d+)\s*(?:\?[^\r\n;]+)?)(?:;(?<comment>.+))?$
+        const string WATCH_PATTERN = "^(?<beforeComment>\\s*(?:http://www\\.nicovideo\\.jp/watch/)?(?<id>(?:[a-z][a-z])?\\d+)\\s*(?:\\?[^\\r\\n;]+)?)(?:;(?<comment>.+))?$";
 
         // ^http://www.nicovideo.jp/mylist/\d+$
         const string MYLIST_PATTERN = "^http://www.nicovideo.jp/mylist/\\d+$";
