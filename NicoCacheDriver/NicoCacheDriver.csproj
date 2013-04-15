@@ -307,6 +307,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="uparrow.png" />
+    <None Include="downarrow.png" />
     <Content Include="third-party\Newtonsoft.Json\readme.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
