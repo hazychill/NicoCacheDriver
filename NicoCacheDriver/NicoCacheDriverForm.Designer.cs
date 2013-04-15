@@ -38,6 +38,8 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.queueingUrls = new System.Windows.Forms.TextBox();
             this.statusIndicator = new System.Windows.Forms.Panel();
+            this.pasteToBottomButton = new System.Windows.Forms.Button();
+            this.pasteTopButton = new System.Windows.Forms.Button();
             this.clearButton = new System.Windows.Forms.Button();
             this.reloadSettingsButton = new System.Windows.Forms.Button();
             this.exitButton = new System.Windows.Forms.Button();
@@ -72,6 +74,8 @@
             this.splitContainer1.Panel1.Controls.Add(this.progressBar1);
             this.splitContainer1.Panel1.Controls.Add(this.queueingUrls);
             this.splitContainer1.Panel1.Controls.Add(this.statusIndicator);
+            this.splitContainer1.Panel1.Controls.Add(this.pasteToBottomButton);
+            this.splitContainer1.Panel1.Controls.Add(this.pasteTopButton);
             this.splitContainer1.Panel1MinSize = 0;
             // 
             // splitContainer1.Panel2
@@ -81,15 +85,15 @@
             this.splitContainer1.Panel2.Controls.Add(this.exitButton);
             this.splitContainer1.Panel2.Controls.Add(this.outputTextBox);
             this.splitContainer1.Panel2MinSize = 0;
-            this.splitContainer1.Size = new System.Drawing.Size(585, 550);
-            this.splitContainer1.SplitterDistance = 283;
+            this.splitContainer1.Size = new System.Drawing.Size(580, 564);
+            this.splitContainer1.SplitterDistance = 290;
             this.splitContainer1.TabIndex = 4;
             this.splitContainer1.TabStop = false;
             // 
             // etaLabel
             // 
             this.etaLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.etaLabel.Location = new System.Drawing.Point(525, 235);
+            this.etaLabel.Location = new System.Drawing.Point(512, 243);
             this.etaLabel.Name = "etaLabel";
             this.etaLabel.Size = new System.Drawing.Size(55, 12);
             this.etaLabel.TabIndex = 61;
@@ -100,8 +104,9 @@
             // 
             this.onlineController.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.onlineController.Appearance = System.Windows.Forms.Appearance.Button;
+            this.onlineController.FlatAppearance.BorderColor = System.Drawing.Color.Red;
             this.onlineController.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.onlineController.Location = new System.Drawing.Point(48, 199);
+            this.onlineController.Location = new System.Drawing.Point(48, 206);
             this.onlineController.Name = "onlineController";
             this.onlineController.Size = new System.Drawing.Size(75, 23);
             this.onlineController.TabIndex = 10;
@@ -114,7 +119,8 @@
             // 
             this.cancelDLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cancelDLButton.Enabled = false;
-            this.cancelDLButton.Location = new System.Drawing.Point(210, 199);
+            this.cancelDLButton.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.cancelDLButton.Location = new System.Drawing.Point(210, 206);
             this.cancelDLButton.Name = "cancelDLButton";
             this.cancelDLButton.Size = new System.Drawing.Size(75, 23);
             this.cancelDLButton.TabIndex = 30;
@@ -126,7 +132,8 @@
             // 
             this.interceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.interceptButton.Enabled = false;
-            this.interceptButton.Location = new System.Drawing.Point(129, 199);
+            this.interceptButton.FlatAppearance.BorderColor = System.Drawing.Color.Red;
+            this.interceptButton.Location = new System.Drawing.Point(129, 206);
             this.interceptButton.Name = "interceptButton";
             this.interceptButton.Size = new System.Drawing.Size(75, 23);
             this.interceptButton.TabIndex = 20;
@@ -138,7 +145,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(496, 204);
+            this.label2.Location = new System.Drawing.Point(483, 212);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(11, 12);
             this.label2.TabIndex = 9;
@@ -148,7 +155,7 @@
             // 
             this.downloadableTimeEnabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnabled.AutoSize = true;
-            this.downloadableTimeEnabled.Location = new System.Drawing.Point(405, 204);
+            this.downloadableTimeEnabled.Location = new System.Drawing.Point(392, 213);
             this.downloadableTimeEnabled.Name = "downloadableTimeEnabled";
             this.downloadableTimeEnabled.Size = new System.Drawing.Size(15, 14);
             this.downloadableTimeEnabled.TabIndex = 40;
@@ -158,7 +165,7 @@
             // 
             this.downloadableTimeEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeEnd.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeEnd.Location = new System.Drawing.Point(509, 201);
+            this.downloadableTimeEnd.Location = new System.Drawing.Point(496, 210);
             this.downloadableTimeEnd.Name = "downloadableTimeEnd";
             this.downloadableTimeEnd.ShowUpDown = true;
             this.downloadableTimeEnd.Size = new System.Drawing.Size(71, 19);
@@ -169,7 +176,7 @@
             // 
             this.downloadableTimeStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadableTimeStart.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.downloadableTimeStart.Location = new System.Drawing.Point(423, 201);
+            this.downloadableTimeStart.Location = new System.Drawing.Point(410, 210);
             this.downloadableTimeStart.Name = "downloadableTimeStart";
             this.downloadableTimeStart.ShowUpDown = true;
             this.downloadableTimeStart.Size = new System.Drawing.Size(71, 19);
@@ -180,7 +187,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 235);
+            this.label1.Location = new System.Drawing.Point(14, 242);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(0, 12);
             this.label1.TabIndex = 2;
@@ -190,9 +197,9 @@
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar1.Enabled = false;
-            this.progressBar1.Location = new System.Drawing.Point(12, 251);
+            this.progressBar1.Location = new System.Drawing.Point(12, 258);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(568, 23);
+            this.progressBar1.Size = new System.Drawing.Size(555, 23);
             this.progressBar1.TabIndex = 1;
             // 
             // queueingUrls
@@ -205,7 +212,7 @@
             this.queueingUrls.Multiline = true;
             this.queueingUrls.Name = "queueingUrls";
             this.queueingUrls.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.queueingUrls.Size = new System.Drawing.Size(568, 181);
+            this.queueingUrls.Size = new System.Drawing.Size(555, 188);
             this.queueingUrls.TabIndex = 0;
             this.queueingUrls.WordWrap = false;
             this.queueingUrls.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.queueingUrls_UpdateTimerEvent);
@@ -214,15 +221,37 @@
             // 
             this.statusIndicator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.statusIndicator.BackColor = System.Drawing.Color.Gray;
-            this.statusIndicator.Location = new System.Drawing.Point(13, 200);
+            this.statusIndicator.Location = new System.Drawing.Point(13, 207);
             this.statusIndicator.Name = "statusIndicator";
             this.statusIndicator.Size = new System.Drawing.Size(20, 20);
             this.statusIndicator.TabIndex = 10;
             // 
+            // pasteToBottomButton
+            // 
+            this.pasteToBottomButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.pasteToBottomButton.Image = global::NicoCacheDriver.Properties.Resources.downarrow;
+            this.pasteToBottomButton.Location = new System.Drawing.Point(349, 206);
+            this.pasteToBottomButton.Name = "pasteToBottomButton";
+            this.pasteToBottomButton.Size = new System.Drawing.Size(23, 23);
+            this.pasteToBottomButton.TabIndex = 63;
+            this.pasteToBottomButton.UseVisualStyleBackColor = true;
+            this.pasteToBottomButton.Click += new System.EventHandler(this.pasteToBottomButton_Click);
+            // 
+            // pasteTopButton
+            // 
+            this.pasteTopButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.pasteTopButton.Image = global::NicoCacheDriver.Properties.Resources.uparrow;
+            this.pasteTopButton.Location = new System.Drawing.Point(327, 206);
+            this.pasteTopButton.Name = "pasteTopButton";
+            this.pasteTopButton.Size = new System.Drawing.Size(23, 23);
+            this.pasteTopButton.TabIndex = 62;
+            this.pasteTopButton.UseVisualStyleBackColor = true;
+            this.pasteTopButton.Click += new System.EventHandler(this.pasteTopButton_Click);
+            // 
             // clearButton
             // 
             this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.clearButton.Location = new System.Drawing.Point(92, 229);
+            this.clearButton.Location = new System.Drawing.Point(92, 236);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(75, 23);
             this.clearButton.TabIndex = 90;
@@ -233,7 +262,7 @@
             // reloadSettingsButton
             // 
             this.reloadSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.reloadSettingsButton.Location = new System.Drawing.Point(11, 229);
+            this.reloadSettingsButton.Location = new System.Drawing.Point(11, 236);
             this.reloadSettingsButton.Name = "reloadSettingsButton";
             this.reloadSettingsButton.Size = new System.Drawing.Size(75, 23);
             this.reloadSettingsButton.TabIndex = 80;
@@ -244,7 +273,7 @@
             // exitButton
             // 
             this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.exitButton.Location = new System.Drawing.Point(506, 229);
+            this.exitButton.Location = new System.Drawing.Point(492, 236);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 23);
             this.exitButton.TabIndex = 100;
@@ -264,7 +293,7 @@
             this.outputTextBox.Name = "outputTextBox";
             this.outputTextBox.ReadOnly = true;
             this.outputTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.outputTextBox.Size = new System.Drawing.Size(568, 211);
+            this.outputTextBox.Size = new System.Drawing.Size(555, 218);
             this.outputTextBox.TabIndex = 70;
             this.outputTextBox.WordWrap = false;
             // 
@@ -284,7 +313,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(585, 550);
+            this.ClientSize = new System.Drawing.Size(580, 564);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "NicoCacheDriverForm";
@@ -323,6 +352,8 @@
         private System.Windows.Forms.Button reloadSettingsButton;
         private System.Windows.Forms.Button clearButton;
         private System.Windows.Forms.Label etaLabel;
+        private System.Windows.Forms.Button pasteTopButton;
+        private System.Windows.Forms.Button pasteToBottomButton;
     }
 }
 

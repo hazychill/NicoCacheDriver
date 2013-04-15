@@ -473,6 +473,34 @@ namespace Hazychill.NicoCacheDriver {
             outputTextBox.Clear();
         }
 
+        private void pasteTopButton_Click(object sender, EventArgs e) {
+            if (Clipboard.ContainsData(DataFormats.Text)) {
+                var text = Clipboard.GetData(DataFormats.Text) as string;
+                if (!string.IsNullOrEmpty(text)) {
+                    var videoInfo = OnelineVideoInfo.FromString(text);
+                    if (videoInfo.IsWatchUrl) {
+                        WithEditQueueingUrls(lines => {
+                            return (new[] { text }).Concat(lines);
+                        });
+                    }
+                }
+            }
+        }
+
+        private void pasteToBottomButton_Click(object sender, EventArgs e) {
+            if (Clipboard.ContainsData(DataFormats.Text)) {
+                var text = Clipboard.GetData(DataFormats.Text) as string;
+                if (!string.IsNullOrEmpty(text)) {
+                    var videoInfo = OnelineVideoInfo.FromString(text);
+                    if (videoInfo.IsWatchUrl) {
+                        WithEditQueueingUrls(lines => {
+                            return lines.Concat((new[] { text }));
+                        });
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Private methods
