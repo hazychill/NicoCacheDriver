@@ -477,10 +477,10 @@ namespace Hazychill.NicoCacheDriver {
             if (Clipboard.ContainsData(DataFormats.Text)) {
                 var text = Clipboard.GetData(DataFormats.Text) as string;
                 if (!string.IsNullOrEmpty(text)) {
-                    var videoInfo = OnelineVideoInfo.FromString(text);
-                    if (videoInfo.IsWatchUrl) {
+                    var firstLine = text.Split('\r', '\n').FirstOrDefault();
+                    if (!string.IsNullOrWhiteSpace(firstLine)) {
                         WithEditQueueingUrls(lines => {
-                            return (new[] { text }).Concat(lines);
+                            return (new[] { firstLine }).Concat(lines);
                         });
                     }
                 }
@@ -491,10 +491,10 @@ namespace Hazychill.NicoCacheDriver {
             if (Clipboard.ContainsData(DataFormats.Text)) {
                 var text = Clipboard.GetData(DataFormats.Text) as string;
                 if (!string.IsNullOrEmpty(text)) {
-                    var videoInfo = OnelineVideoInfo.FromString(text);
-                    if (videoInfo.IsWatchUrl) {
+                    var firstLine = text.Split('\r', '\n').FirstOrDefault();
+                    if (!string.IsNullOrWhiteSpace(firstLine)) {
                         WithEditQueueingUrls(lines => {
-                            return lines.Concat((new[] { text }));
+                            return lines.Concat((new[] { firstLine }));
                         });
                     }
                 }
